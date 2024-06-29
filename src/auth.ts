@@ -15,9 +15,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     providers: [Google],
     adapter: ConvexAdapter,
-    pages: {
-        signIn: '/login',
-    },
     callbacks: {
         async signIn({ user }) {
             const file = await fs.readFile(
