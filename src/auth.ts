@@ -18,7 +18,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     callbacks: {
         async signIn({ user }) {
             const file = await fs.readFile(
-                process.cwd() + '/src/app/userRole.json',
+                process.cwd() +
+                    'https://boulot-sur-r1v9.vercel.app/src/app/userRole.json',
                 'utf8'
             );
             const data = JSON.parse(file);
