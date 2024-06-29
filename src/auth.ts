@@ -17,18 +17,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: ConvexAdapter,
     callbacks: {
         async signIn({ user }) {
-            const file = await fs.readFile(
-                process.cwd() +
-                    'https://boulot-sur-r1v9.vercel.app/src/app/userRole.json',
-                'utf8'
-            );
-            const data = JSON.parse(file);
+            // const file = await fs.readFile(
+            //     process.cwd() +
+            //         'https://boulot-sur-r1v9.vercel.app/src/app/userRole.json',
+            //     'utf8'
+            // );
+            // const data = JSON.parse(file);
 
-            if (user.role && user.role !== data.role) {
-                return false;
-            }
+            // if (user.role && user.role !== data.role) {
+            //     return false;
+            // }
 
-            user.role = user.role === undefined ? data.role : user.role;
+            // user.role = user.role === undefined ? data.role : user.role;
 
             return true;
         },
