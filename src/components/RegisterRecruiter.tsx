@@ -68,16 +68,16 @@ function RegisterRecruiter({ recruiter }: Props) {
                 description: data.description,
             });
 
-            if (updatedRecruiter?.success === false) {
+            if (updatedRecruiter?.success! === false) {
                 return form.setError('root', {
                     message: updatedRecruiter.message,
                 });
             }
 
-            if (updatedRecruiter?.success === true) {
+            if (updatedRecruiter?.success! === true) {
                 toast({
                     variant: 'success',
-                    title: updatedRecruiter.message,
+                    title: updatedRecruiter?.message,
                     description: `${new Date().toLocaleDateString()}`,
                 });
 
@@ -92,13 +92,13 @@ function RegisterRecruiter({ recruiter }: Props) {
             });
 
             if (result?.success === false) {
-                return form.setError('root', { message: result.message });
+                return form.setError('root', { message: result?.message });
             }
 
             if (result?.success === true) {
                 toast({
                     variant: 'success',
-                    title: result.message,
+                    title: result?.message,
                     description: `${new Date()}`,
                 });
                 form.reset();
