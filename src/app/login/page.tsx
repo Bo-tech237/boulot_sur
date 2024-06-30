@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import LoginTabs from './LoginTabs';
 import { redirect } from 'next/navigation';
 import SignIn from '@/components/SignIn';
 import getSession from '@/lib/getSession';
@@ -17,7 +16,7 @@ export default async function LoginPage() {
 
     return (
         <div className="flex items-center justify-center h-screen">
-            <LoginTabs SignIn={<SignIn />} />
+            <SignIn />
         </div>
     );
 }

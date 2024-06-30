@@ -43,7 +43,7 @@ function ApplicantEducationForm(
         <div>
             <FormWrapper title="Education">
                 {educationFields.map((field, index) => (
-                    <ScrollArea className="h-fit" key={field.id}>
+                    <ScrollArea key={field.id}>
                         <FormField
                             control={form.control}
                             name={`education.${index}.institutionName`}

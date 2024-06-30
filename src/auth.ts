@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     callbacks: {
         async signIn({ user }) {
             if (user.role === undefined) {
-                return '/login?error=Please you have to first register.';
+                return '/login?error=Please first register.';
             }
 
             return true;

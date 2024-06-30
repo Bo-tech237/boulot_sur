@@ -65,17 +65,6 @@ export const applicantNavItems = [
 
 export const jobTypes = ['Full-time', 'Internship', 'Part-time', 'Contract'];
 
-export const categories = [
-    { type: 'IT Software', icon: FileStack, number: 2024 },
-    { type: 'Technology', icon: MonitorCheck, number: 1250 },
-    { type: 'Government', icon: File, number: 802 },
-    { type: 'Accounting / Finance', icon: Building, number: 577 },
-    { type: 'Construction / Facilities', icon: BrickWall, number: 285 },
-    { type: 'Tele-communications', icon: Antenna, number: 495 },
-    { type: 'Designs Multimedia', icon: Layers3, number: 1045 },
-    { type: 'Human Resource', icon: Notebook, number: 1516 },
-];
-
 export const navLinks = [
     { title: 'Home', href: '/' },
     { title: 'Jobs', href: '/jobs' },
@@ -83,7 +72,10 @@ export const navLinks = [
     { title: 'Contact', href: '/contact' },
 ];
 
-export const authLinks = [{ title: 'Sign in', href: '/login' }];
+export const authLinks = [
+    { title: 'Sign in', href: '/login' },
+    { title: 'Register', href: '/register' },
+];
 
 export const footerInfos = [
     {

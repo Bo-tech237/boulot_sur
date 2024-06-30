@@ -67,30 +67,58 @@ function NavBar() {
 
             <section className="flex items-center gap-4">
                 <div className="sm:flex sm:gap-4">
-                    {authLinks.map((authLink) => (
-                        <div key={authLink.title}>
-                            {user ? (
-                                <UserButton user={user} />
-                            ) : (
-                                <Link
-                                    key={authLink.title}
-                                    href={authLink.href}
-                                    className={cn(
-                                        buttonVariants({
-                                            variant:
-                                                pathname === `${authLink.href}`
-                                                    ? 'default'
-                                                    : 'ghost',
-                                        }),
-                                        'default' && '',
-                                        'justify-start text-sm lg:text-xl'
-                                    )}
-                                >
-                                    {authLink.title}
-                                </Link>
-                            )}
-                        </div>
-                    ))}
+                    {authLinks.map((authLink) =>
+                        authLink.href === '/login' ? (
+                            <div key={authLink.title}>
+                                {user ? (
+                                    <UserButton user={user} />
+                                ) : (
+                                    <Link
+                                        key={authLink.title}
+                                        href={authLink.href}
+                                        className={cn(
+                                            buttonVariants({
+                                                variant:
+                                                    pathname ===
+                                                    `${authLink.href}`
+                                                        ? 'default'
+                                                        : 'ghost',
+                                            }),
+                                            'default' && '',
+                                            'justify-start text-sm lg:text-xl'
+                                        )}
+                                    >
+                                        {authLink.title}
+                                    </Link>
+                                )}
+                            </div>
+                        ) : (
+                            <div
+                                className="hidden sm:flex"
+                                key={authLink.title}
+                            >
+                                {!user && (
+                                    <Link
+                                        key={authLink.title}
+                                        href={authLink.href}
+                                        className={cn(
+                                            buttonVariants({
+                                                variant:
+                                                    pathname ===
+                                                    `${authLink.href}`
+                                                        ? 'default'
+                                                        : 'ghost',
+                                            }),
+                                            'default' && '',
+                                            'justify-start text-sm lg:text-xl'
+                                        )}
+                                    >
+                                        {authLink.title}
+                                    </Link>
+                                )}
+                            </div>
+                        )
+                    )}
                 </div>
                 <ModeToggle />
 

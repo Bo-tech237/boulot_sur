@@ -81,7 +81,7 @@ function RegisterRecruiter({ recruiter }: Props) {
                     description: `${new Date().toLocaleDateString()}`,
                 });
 
-                return router.push('/dashboard/recruiter/profile');
+                return router.push('/login');
             }
         } else {
             const result = await createRecruiter({

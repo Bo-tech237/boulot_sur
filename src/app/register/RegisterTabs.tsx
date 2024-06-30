@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import UserLogin from './UserLogin';
 import {
     Card,
     CardContent,
@@ -10,8 +9,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import RegisterRecruiter from '@/components/RegisterRecruiter';
+import RegisterApplicant from '@/components/RegisterApplicant';
 
-function LoginTabs({ SignIn }: { SignIn: React.ReactNode }) {
+function RegisterTabs() {
     return (
         <div>
             <Tabs defaultValue="recruiter" className="w-80 sm:w-[400px]">
@@ -24,14 +25,11 @@ function LoginTabs({ SignIn }: { SignIn: React.ReactNode }) {
                         <CardHeader>
                             <CardTitle>RECRUITER ACCOUNT</CardTitle>
                             <CardDescription>
-                                Press to sign in with your Google account.
+                                Create your account.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <UserLogin
-                                accountType="recruiter"
-                                SignIn={SignIn}
-                            />
+                            <RegisterRecruiter />
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -40,14 +38,11 @@ function LoginTabs({ SignIn }: { SignIn: React.ReactNode }) {
                         <CardHeader>
                             <CardTitle>APPLICANT ACCOUNT</CardTitle>
                             <CardDescription>
-                                Press to sign in with your Google account.
+                                Create your account.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <UserLogin
-                                accountType="applicant"
-                                SignIn={SignIn}
-                            />
+                            <RegisterApplicant />
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -56,4 +51,4 @@ function LoginTabs({ SignIn }: { SignIn: React.ReactNode }) {
     );
 }
 
-export default LoginTabs;
+export default RegisterTabs;
