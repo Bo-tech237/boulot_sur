@@ -18,7 +18,7 @@ import { ReactNode, useState, useTransition } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
-import { logOut } from '@/action/getRole';
+import { signOut } from 'next-auth/react';
 
 type Props = {
     id: Id<'users'>;
@@ -39,7 +39,7 @@ function DeleteRecruitersDialog({ id, children }: Props) {
 
             console.log('DeleteRecruiters', deletedRecruiter);
 
-            logOut();
+            signOut({ callbackUrl: '/' });
             toast({
                 variant: 'success',
                 title: deletedRecruiter.message,
