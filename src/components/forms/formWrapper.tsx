@@ -16,10 +16,10 @@ type FormWrapperProps = {
 export function FormWrapper({ title, children }: FormWrapperProps) {
     return (
         <div>
-            <CardHeader>
-                <CardTitle> {title}</CardTitle>
-            </CardHeader>
-            <CardContent>{children}</CardContent>
+            <div>
+                <div> {title}</div>
+            </div>
+            <div>{children}</div>
         </div>
     );
 }

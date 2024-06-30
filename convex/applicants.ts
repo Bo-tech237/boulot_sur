@@ -75,7 +75,7 @@ export const createApplicant = mutation({
         const identity = await ctx.auth.getUserIdentity();
 
         if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+            return;
         }
 
         const user = await ctx.db.get(identity?.subject as Id<'users'>);

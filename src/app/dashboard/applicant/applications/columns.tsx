@@ -12,12 +12,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import UpdateDialog from '@/components/UpdateDialog';
 import RatingDialog from '@/components/RatingDialog';
 import { ShowRating } from '@/components/ui/showRating';
 import Link from 'next/link';
 import { ApplicationDataType } from '@/types/applications';
 import DeleteApplicationsDialog from '@/components/DeleteApplicationsDialog';
+import UpdateStatusDialog from '@/components/UpdateStatusDialog';
 
 export const columns: ColumnDef<ApplicationDataType>[] = [
     {
@@ -108,9 +108,9 @@ export const columns: ColumnDef<ApplicationDataType>[] = [
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <UpdateDialog application={application}>
+                            <UpdateStatusDialog application={application}>
                                 Change status
-                            </UpdateDialog>
+                            </UpdateStatusDialog>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

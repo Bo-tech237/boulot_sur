@@ -15,7 +15,7 @@ import RegisterApplicant from '@/components/RegisterApplicant';
 function RegisterTabs() {
     return (
         <div>
-            <Tabs defaultValue="recruiter" className="w-80 sm:w-[400px]">
+            <Tabs defaultValue="recruiter" className="w-96 sm:w-[400px]">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="recruiter">RECRUITER</TabsTrigger>
                     <TabsTrigger value="applicant">APPLICANT</TabsTrigger>

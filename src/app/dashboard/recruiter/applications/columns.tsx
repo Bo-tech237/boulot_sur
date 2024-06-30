@@ -14,7 +14,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
 import { Download } from 'lucide-react';
-import UpdateDialog from '@/components/UpdateDialog';
+import UpdateStatusDialog from '@/components/UpdateStatusDialog';
 import RatingDialog from '@/components/RatingDialog';
 import { ShowRating } from '@/components/ui/showRating';
 import { ApplicationDataType } from '@/types/applications';
@@ -135,9 +135,9 @@ export const columns: ColumnDef<ApplicationDataType>[] = [
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <UpdateDialog application={application}>
+                            <UpdateStatusDialog application={application}>
                                 Change status
-                            </UpdateDialog>
+                            </UpdateStatusDialog>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

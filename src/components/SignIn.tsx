@@ -18,11 +18,8 @@ export default async function SignIn() {
             <Card className="w-[350px] flex flex-col gap-5 p-5">
                 <CardHeader>
                     <CardTitle>
-                        <div className="md:flex md:items-center md:justify-center md:gap-12">
-                            <Link
-                                className="block bg-orange-50 rounded"
-                                href="/"
-                            >
+                        <div className="flex items-center justify-center md:gap-12">
+                            <Link className="bg-zinc-100 rounded" href="/">
                                 <span className="sr-only">Home</span>
                                 <Image
                                     src={'/logo-transparent.png'}

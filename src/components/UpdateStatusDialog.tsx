@@ -22,7 +22,7 @@ type Props = {
     children: ReactNode;
 };
 
-function UpdateDialog({ application, children }: Props) {
+function UpdateStatusDialog({ application, children }: Props) {
     const { data: session } = useSession();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -62,4 +62,4 @@ function UpdateDialog({ application, children }: Props) {
     );
 }
 
-export default UpdateDialog;
+export default UpdateStatusDialog;

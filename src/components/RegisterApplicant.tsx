@@ -32,6 +32,15 @@ function RegisterApplicant() {
 
     const form = useForm<applicantTypes>({
         resolver: zodResolver(applicantSchema),
+        defaultValues: {
+            education: [
+                {
+                    institutionName: '',
+                    startYear: '',
+                    endYear: '',
+                },
+            ],
+        },
     });
 
     const {
@@ -73,9 +82,9 @@ function RegisterApplicant() {
             skills: data.skills,
             fileId: storageId,
         });
-        console.log('applicant1', newApplicant);
-        if (newApplicant.success === false) {
-            return form.setError('root', { message: newApplicant.message });
+        console.log('NewApplicant', newApplicant);
+        if (newApplicant?.success === false) {
+            return form.setError('root', { message: newApplicant?.message });
         }
         if (newApplicant?.success === true) {
             toast({
@@ -85,22 +94,22 @@ function RegisterApplicant() {
             });
             form.reset();
 
-            router.push('/dashboard');
+            router.push('/login');
         }
     }
 
     return (
         <div>
-            <Card>
+            <Card className="border-none">
                 <CardHeader>
                     <CardTitle>
-                        <div className="flex gap-2 justify-between">
+                        <div className="flex gap-1 items-center justify-between">
                             <Progress
                                 value={
                                     ((currentStepIndex + 1) / steps.length) *
                                     100
                                 }
-                                className="w-[80%]"
+                                className="w-[60%] h-6 md:w-[80%] md:h-7"
                             />
                             {currentStepIndex + 1} / {steps.length}
                         </div>

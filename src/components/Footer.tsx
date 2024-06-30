@@ -191,14 +191,14 @@ function Footer() {
                         <div className="mt-16 sm:flex sm:items-center sm:justify-between">
                             <div className="flex justify-center sm:justify-start">
                                 <Link
-                                    className="block bg-orange-50 rounded-full"
+                                    className="block bg-zinc-100 rounded-full"
                                     href="/"
                                 >
                                     <span className="sr-only">Home</span>
                                     <Image
                                         src={'/logo-transparent.png'}
                                         alt="Boulot Sur"
-                                        width={150}
+                                        width={100}
                                         height={150}
                                         priority
                                     />

@@ -110,16 +110,16 @@ function RegisterRecruiter({ recruiter }: Props) {
 
     return (
         <div>
-            <Card>
+            <Card className="border-none">
                 <CardHeader>
                     <CardTitle>
-                        <div className="flex gap-2 justify-between">
+                        <div className="flex gap-1 items-center justify-between">
                             <Progress
                                 value={
                                     ((currentStepIndex + 1) / steps.length) *
                                     100
                                 }
-                                className="w-[60%]"
+                                className="w-[60%] h-6 md:w-[80%] md:h-7"
                             />
                             {currentStepIndex + 1} / {steps.length}
                         </div>
@@ -171,6 +171,12 @@ function RegisterRecruiter({ recruiter }: Props) {
                         </form>
                     </Form>
                 </CardContent>
+                <CardFooter className="flex justify-end">
+                    <Link className="text-sm" href={'/login'}>
+                        Already have an account?{' '}
+                        <span className="underline text-blue-900">Login</span>
+                    </Link>
+                </CardFooter>
             </Card>
         </div>
     );

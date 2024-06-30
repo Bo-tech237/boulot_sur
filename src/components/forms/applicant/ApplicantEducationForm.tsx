@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import {
     FormControl,
@@ -10,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { FormWrapper } from '@/components/forms/formWrapper';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 function ApplicantEducationForm(
     form: UseFormReturn<
@@ -39,11 +39,13 @@ function ApplicantEducationForm(
         name: 'education',
     });
 
+    console.log('useArray', educationFields, 'append', append);
+
     return (
         <div>
             <FormWrapper title="Education">
                 {educationFields.map((field, index) => (
-                    <ScrollArea key={field.id}>
+                    <div key={field.id}>
                         <FormField
                             control={form.control}
                             name={`education.${index}.institutionName`}
@@ -102,11 +104,15 @@ function ApplicantEducationForm(
                             >
                                 Add education
                             </Button>
-                            <Button type="button" onClick={() => remove(index)}>
+                            <Button
+                                disabled={index === 0}
+                                type="button"
+                                onClick={() => remove(index)}
+                            >
                                 Remove
                             </Button>
                         </div>
-                    </ScrollArea>
+                    </div>
                 ))}
             </FormWrapper>
         </div>

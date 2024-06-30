@@ -30,12 +30,12 @@ function NavBar() {
     return (
         <header className="flex h-20 items-center justify-between">
             <div className="md:flex md:items-center md:justify-center md:gap-12">
-                <Link className="block bg-orange-50 rounded-full" href="/">
+                <Link className="block bg-zinc-100 rounded-full" href="/">
                     <span className="sr-only">Home</span>
                     <Image
                         src={'/logo-transparent.png'}
                         alt="Boulot Sur"
-                        width={150}
+                        width={100}
                         height={150}
                         priority
                     />
