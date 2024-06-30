@@ -2,7 +2,6 @@ import { SignJWT, importPKCS8 } from 'jose';
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { ConvexAdapter } from '../convex/ConvexAdapter';
-import { promises as fs } from 'fs';
 import Nodemailer from 'next-auth/providers/nodemailer';
 
 const CONVEX_SITE_URL = process.env.CONVEX_SITE_URL;
@@ -13,22 +12,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     theme: {
         logo: '/logo-transparent.png',
     },
+    pages: {
+        signIn: '/login',
+    },
     providers: [Google],
     adapter: ConvexAdapter,
     callbacks: {
         async signIn({ user }) {
-            // const file = await fs.readFile(
-            //     process.cwd() +
-            //         'https://boulot-sur-r1v9.vercel.app/src/app/userRole.json',
-            //     'utf8'
-            // );
-            // const data = JSON.parse(file);
-
-            // if (user.role && user.role !== data.role) {
-            //     return false;
-            // }
-
-            // user.role = user.role === undefined ? data.role : user.role;
+            if (user.role === undefined) {
+                return '/login?error=Please you have to first register.';
+            }
 
             return true;
         },

@@ -1,6 +1,7 @@
 import { signIn } from '@/auth';
 import React from 'react';
 import { Button } from './ui/button';
+import GoogleSignInError from '@/app/login/GoogleSignInError';
 
 export default async function SignIn() {
     return (
@@ -14,6 +15,7 @@ export default async function SignIn() {
                 <Button type="submit" className="w-full">
                     Sign In With Google
                 </Button>
+                <GoogleSignInError />
             </form>
         </div>
     );
