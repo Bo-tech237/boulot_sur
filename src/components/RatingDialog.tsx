@@ -34,7 +34,10 @@ function RatingDialog({ application, children }: Props) {
                 <DialogTrigger asChild>
                     <div className="cursor-pointer">{children}</div>
                 </DialogTrigger>
-                <DialogContent className="w-80 sm:max-w-[425px]">
+                <DialogContent
+                    className="w-80 sm:max-w-[425px]"
+                    onKeyDown={(e) => e.stopPropagation()}
+                >
                     <DialogHeader className="flex flex-col gap-3">
                         <DialogTitle>Are you sure?</DialogTitle>
                         <DialogDescription>
