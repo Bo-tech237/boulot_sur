@@ -11,14 +11,8 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import Image from 'next/image';
-import getSession from '@/lib/getSession';
 
 export default async function SignIn() {
-    const session = await getSession();
-    const redirect = '/register';
-
-    if (session) return;
-
     return (
         <div>
             <Card className="w-[350px] flex flex-col gap-5 p-5">
@@ -43,13 +37,7 @@ export default async function SignIn() {
                         <form
                             action={async () => {
                                 'use server';
-                                await signIn(
-                                    'google',
-
-                                    {
-                                        redirectTo: `${redirect}`,
-                                    }
-                                );
+                                await signIn('google');
                             }}
                         >
                             <Button type="submit" className="w-full">

@@ -8,7 +8,7 @@ const CONVEX_SITE_URL = process.env.CONVEX_SITE_URL;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     trustHost: true,
-    debug: true,
+    debug: process.env.NODE_ENV !== 'production',
     theme: {
         logo: '/logo-transparent.png',
     },
