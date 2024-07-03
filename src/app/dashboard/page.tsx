@@ -3,8 +3,8 @@ import getSession from '@/lib/getSession';
 import AdminWelcome from './AdminWelcome';
 
 async function DashboardPage() {
-    const session = await getSession();
-    if (!session) redirect('/login');
+    // const session = await getSession();
+    // if (!session) redirect('/login');
 
     return (
         <>

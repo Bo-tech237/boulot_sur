@@ -14,14 +14,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     pages: {
         signIn: '/login',
+        error: '/login',
     },
     providers: [Google],
     adapter: ConvexAdapter,
     callbacks: {
         async signIn({ user }) {
-            if (user.role === undefined) {
-                return '/login?error=Please first register.';
-            }
+            user.role = user.role ?? 'user';
 
             return true;
         },

@@ -7,7 +7,7 @@ import RecentSales from '@/components/ui/recent-sales';
 
 export default function AdminWelcome() {
     return (
-        <div>
+        <div className="flex flex-col gap-5">
             <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
                 <Revenue />
                 <Subscriptions />

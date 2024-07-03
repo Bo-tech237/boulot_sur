@@ -13,7 +13,7 @@ async function ProfilePage() {
     const session = await getSession();
 
     if (!session) {
-        return redirect('/');
+        return redirect('/login');
     }
 
     return (

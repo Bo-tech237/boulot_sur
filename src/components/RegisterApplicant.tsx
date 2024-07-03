@@ -94,7 +94,7 @@ function RegisterApplicant() {
             });
             form.reset();
 
-            router.push('/login');
+            router.push('/dashboard');
         }
     }
 
@@ -148,7 +148,7 @@ function RegisterApplicant() {
                                 )}
                             </div>
                             <div
-                                className="flex h-2 items-end space-x-1"
+                                className="flex h-2 items-center mt-10 space-x-1"
                                 aria-live="polite"
                                 aria-atomic="true"
                             >
@@ -161,12 +161,6 @@ function RegisterApplicant() {
                         </form>
                     </Form>
                 </CardContent>
-                <CardFooter className="flex justify-end">
-                    <Link className="text-sm" href={'/login'}>
-                        Already have an account?{' '}
-                        <span className="underline text-blue-900">Login</span>
-                    </Link>
-                </CardFooter>
             </Card>
         </div>
     );

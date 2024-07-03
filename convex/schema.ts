@@ -71,7 +71,7 @@ const authTables = {
 export default defineSchema({
     ...authTables,
     recruiters: defineTable({
-        userId: v.id('users'),
+        userId: v.optional(v.id('users')),
         phone: v.number(),
         country: v.string(),
         city: v.string(),
@@ -81,7 +81,7 @@ export default defineSchema({
     }).index('byUserId', ['userId']),
 
     applicants: defineTable({
-        userId: v.id('users'),
+        userId: v.optional(v.id('users')),
         education: v.array(
             v.object({
                 institutionName: v.string(),

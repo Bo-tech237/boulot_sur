@@ -1,14 +1,3 @@
-import {
-    Antenna,
-    BrickWall,
-    Building,
-    File,
-    FileStack,
-    Layers3,
-    MonitorCheck,
-    Notebook,
-} from 'lucide-react';
-
 export const recruiterNavItems = [
     {
         title: 'Dashboard',
@@ -74,7 +63,7 @@ export const navLinks = [
 
 export const authLinks = [
     { title: 'Sign in', href: '/login' },
-    { title: 'Register', href: '/register' },
+    { title: 'Admin', href: '/admin' },
 ];
 
 export const footerInfos = [

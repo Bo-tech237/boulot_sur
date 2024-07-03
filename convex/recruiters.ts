@@ -74,7 +74,10 @@ export const createRecruiter = mutation({
         const user = await ctx.db.get(identity?.subject as Id<'users'>);
 
         if (user?.role !== 'recruiter') {
-            return { success: false, message: 'You must be a recruiter' };
+            return {
+                success: false,
+                message: 'You must be a recruiter',
+            };
         }
 
         const recruiterId = await ctx.db.insert('recruiters', {
@@ -86,12 +89,16 @@ export const createRecruiter = mutation({
             rating: 0,
         });
 
-        if (recruiterId) {
-            return {
-                success: true,
-                message: `Recruiter ${user.name} created successfully`,
-            };
+        if (recruiterId === null) {
+            return { success: false, message: 'Error try again' };
         }
+
+        await ctx.db.patch(user._id, { role: 'recruiter' });
+
+        return {
+            success: true,
+            message: 'Recruiter account created successfully',
+        };
     },
 });
 
@@ -117,7 +124,6 @@ export const updateRecruiter = mutation({
         }
 
         await ctx.db.patch(args.recruiterId, {
-            userId: user._id,
             phone: args.phone,
             country: args.country,
             city: args.city,

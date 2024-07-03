@@ -81,7 +81,7 @@ function RegisterRecruiter({ recruiter }: Props) {
                     description: `${new Date().toLocaleDateString()}`,
                 });
 
-                return router.push('/login');
+                return router.push('/dashboard');
             }
         } else {
             const result = await createRecruiter({
@@ -158,7 +158,7 @@ function RegisterRecruiter({ recruiter }: Props) {
                                 )}
                             </div>
                             <div
-                                className="flex h-2 items-end space-x-1 pl-6"
+                                className="flex h-2 mt-10 items-center space-x-1 pl-6"
                                 aria-live="polite"
                                 aria-atomic="true"
                             >
@@ -171,12 +171,6 @@ function RegisterRecruiter({ recruiter }: Props) {
                         </form>
                     </Form>
                 </CardContent>
-                <CardFooter className="flex justify-end">
-                    <Link className="text-sm" href={'/login'}>
-                        Already have an account?{' '}
-                        <span className="underline text-blue-900">Login</span>
-                    </Link>
-                </CardFooter>
             </Card>
         </div>
     );

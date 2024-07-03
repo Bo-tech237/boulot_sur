@@ -54,6 +54,15 @@ export const getApplicantOnlyById = query({
     },
 });
 
+export const updateUserId = mutation({
+    args: { userId: v.id('users'), applicantId: v.id('applicants') },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.applicantId, {
+            userId: args.userId,
+        });
+    },
+});
+
 export const createApplicant = mutation({
     args: {
         education: v.array(
@@ -75,13 +84,16 @@ export const createApplicant = mutation({
         const identity = await ctx.auth.getUserIdentity();
 
         if (identity === null) {
-            return;
+            throw new Error('Unauthenticated call to mutation');
         }
 
         const user = await ctx.db.get(identity?.subject as Id<'users'>);
 
         if (user?.role !== 'applicant') {
-            return { success: false, message: 'You must be an applicant' };
+            return {
+                success: false,
+                message: 'You must be an applicant',
+            };
         }
 
         const applicantId = await ctx.db.insert('applicants', {
@@ -96,7 +108,12 @@ export const createApplicant = mutation({
             return { success: false, message: 'Error try again' };
         }
 
-        return { success: true, message: 'Account created successfully' };
+        await ctx.db.patch(user._id, { role: 'applicant' });
+
+        return {
+            success: true,
+            message: 'Applicant account created successfully',
+        };
     },
 });
 
@@ -166,7 +183,6 @@ export const updateApplicant = mutation({
         }
 
         await ctx.db.patch(args.applicantId, {
-            userId: user._id!,
             education: args.education,
             skills: args.skills,
             updatedAt: Date.now(),
