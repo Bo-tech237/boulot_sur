@@ -25,15 +25,16 @@ import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
 import { RecruiterDataType } from '@/types/recruiters';
 import { Progress } from '@/components/ui/progress';
+import { useSession } from 'next-auth/react';
 
 type Props = { recruiter?: RecruiterDataType | null };
 
 function RegisterRecruiter({ recruiter }: Props) {
     const createRecruiter = useMutation(api.recruiters.createRecruiter);
     const updateRecruiter = useMutation(api.recruiters.updateRecruiter);
-
     const { toast } = useToast();
     const router = useRouter();
+    const { update } = useSession();
 
     const form = useForm<recruiterTypes>({
         resolver: zodResolver(recruiterSchema),
@@ -96,6 +97,7 @@ function RegisterRecruiter({ recruiter }: Props) {
             }
 
             if (result?.success === true) {
+                update();
                 toast({
                     variant: 'success',
                     title: result?.message,
@@ -158,7 +160,7 @@ function RegisterRecruiter({ recruiter }: Props) {
                                 )}
                             </div>
                             <div
-                                className="flex h-2 mt-10 items-center space-x-1 pl-6"
+                                className="flex h-2 mt-10 items-center justify-center space-x-1 pl-6"
                                 aria-live="polite"
                                 aria-atomic="true"
                             >

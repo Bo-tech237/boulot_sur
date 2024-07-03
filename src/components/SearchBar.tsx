@@ -24,7 +24,7 @@ export default function SearchBar() {
         <div className="relative my-8 block">
             <div className="">
                 <Input
-                    className="py-6 pl-12 text-xl"
+                    className="py-6 pl-12 text-xs sm:text-xl"
                     placeholder="Search for jobs"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}

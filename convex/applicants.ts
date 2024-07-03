@@ -89,10 +89,10 @@ export const createApplicant = mutation({
 
         const user = await ctx.db.get(identity?.subject as Id<'users'>);
 
-        if (user?.role !== 'applicant') {
+        if (user?.role !== 'user') {
             return {
                 success: false,
-                message: 'You must be an applicant',
+                message: 'You must be a user',
             };
         }
 
@@ -135,7 +135,7 @@ export const updateCV = mutation({
             )
             .unique();
 
-        if (!applicant) return;
+        if (!applicant?.fileId) return;
 
         await ctx.db.patch(applicant?._id!, {
             fileId: args.fileId,
@@ -147,6 +147,37 @@ export const updateCV = mutation({
         if (applicant === null) {
             return { success: false, message: 'Error try again' };
         }
+
+        return { success: true, message: 'File Updated successfully' };
+    },
+});
+
+export const addFileId = mutation({
+    args: {
+        fileId: v.id('_storage'),
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+
+        if (identity === null) {
+            throw new Error('Unauthenticated call to mutation');
+        }
+
+        const applicant = await ctx.db
+            .query('applicants')
+            .withIndex('byUserId', (q) =>
+                q.eq('userId', identity.subject as Id<'users'>)
+            )
+            .unique();
+
+        if (!applicant) {
+            return { success: false, message: 'Error try again' };
+        }
+
+        await ctx.db.patch(applicant?._id!, {
+            fileId: args.fileId,
+            updatedAt: Date.now(),
+        });
 
         return { success: true, message: 'File Updated successfully' };
     },

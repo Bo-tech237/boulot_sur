@@ -16,8 +16,10 @@ type FormWrapperProps = {
 export function FormWrapper({ title, children }: FormWrapperProps) {
     return (
         <div>
-            <div>
-                <div> {title}</div>
+            <div className="mb-5">
+                <div className="text-2xl font-semibold leading-none tracking-tight">
+                    {title}
+                </div>
             </div>
             <div>{children}</div>
         </div>

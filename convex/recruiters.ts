@@ -73,10 +73,10 @@ export const createRecruiter = mutation({
 
         const user = await ctx.db.get(identity?.subject as Id<'users'>);
 
-        if (user?.role !== 'recruiter') {
+        if (user?.role !== 'user') {
             return {
                 success: false,
-                message: 'You must be a recruiter',
+                message: 'You must be a user',
             };
         }
 

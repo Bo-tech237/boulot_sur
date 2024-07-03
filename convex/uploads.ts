@@ -6,11 +6,11 @@ export const generateUploadUrl = mutation({
     handler: async (ctx, args) => {
         // Return an upload URL
 
-        // const identity = await ctx.auth.getUserIdentity();
+        const identity = await ctx.auth.getUserIdentity();
 
-        // if (identity === null) {
-        //     throw new Error('Unauthenticated call to mutation');
-        // }
+        if (identity === null) {
+            throw new Error('Your need to be loggged in');
+        }
 
         return await ctx.storage.generateUploadUrl();
     },

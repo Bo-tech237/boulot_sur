@@ -19,24 +19,11 @@ export default auth((req) => {
     const { nextUrl } = req;
     const user = req.auth?.user;
     const isLoggedIn = !!req.auth;
-    console.log('Route', nextUrl.pathname);
-    console.log('Is LoggedIn', isLoggedIn);
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
     const isAuthRoute1 = authRoutes1.includes(nextUrl.pathname);
     const isAuthRoute2 = authRoutes2.includes(nextUrl.pathname);
-    const isDashboard = DEFAULT_REGISTER_REDIRECT.includes(nextUrl.pathname);
-
-    console.log(
-        'Isapiroute:',
-        isApiAuthRoute,
-        'ispublic:',
-        isPublicRoute,
-        'isauthroute1',
-        isAuthRoute1,
-        'isauthroute2',
-        isAuthRoute2
-    );
+    const isDashboard = nextUrl.pathname.startsWith(DEFAULT_REGISTER_REDIRECT);
 
     if (isApiAuthRoute) {
         return undefined;
@@ -52,6 +39,12 @@ export default auth((req) => {
         }
 
         return undefined;
+    }
+
+    if (isDashboard) {
+        if (isLoggedIn && user?.role === 'user') {
+            return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+        }
     }
 
     if (isAuthRoute2) {

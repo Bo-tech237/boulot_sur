@@ -23,12 +23,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Progress } from '@/components/ui/progress';
+import { useSession } from 'next-auth/react';
 
 function RegisterApplicant() {
     const createApplicant = useMutation(api.applicants.createApplicant);
     const generateUploadUrl = useMutation(api.uploads.generateUploadUrl);
     const { toast } = useToast();
     const router = useRouter();
+    const { update } = useSession();
 
     const form = useForm<applicantTypes>({
         resolver: zodResolver(applicantSchema),
@@ -87,6 +89,7 @@ function RegisterApplicant() {
             return form.setError('root', { message: newApplicant?.message });
         }
         if (newApplicant?.success === true) {
+            update();
             toast({
                 variant: 'success',
                 title: newApplicant.message,
@@ -148,7 +151,7 @@ function RegisterApplicant() {
                                 )}
                             </div>
                             <div
-                                className="flex h-2 items-center mt-10 space-x-1"
+                                className="flex h-2 mt-10 items-center justify-center space-x-1"
                                 aria-live="polite"
                                 aria-atomic="true"
                             >

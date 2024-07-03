@@ -39,8 +39,6 @@ function ApplicantEducationForm(
         name: 'education',
     });
 
-    console.log('useArray', educationFields, 'append', append);
-
     return (
         <div>
             <FormWrapper title="Education">

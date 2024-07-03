@@ -25,7 +25,6 @@ function NavBar() {
     const pathname = usePathname();
     const { data: session, update } = useSession();
     const user = session?.user;
-    !session?.convexToken && update();
 
     return (
         <header className="flex h-20 items-center justify-between">

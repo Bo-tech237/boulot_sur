@@ -36,9 +36,16 @@ export default function UserButton({ user }: UserButtonProps) {
                 <DropdownMenuLabel>{user.name || 'User'}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>{user.role}</DropdownMenuItem>
+                    <DropdownMenuItem>Role: {user.role}</DropdownMenuItem>
 
-                    {user && (
+                    {user.role === 'user' ? (
+                        <DropdownMenuItem asChild>
+                            <Link href="/register">
+                                <Lock className="mr-2 h-4 w-4" />
+                                Register
+                            </Link>
+                        </DropdownMenuItem>
+                    ) : (
                         <DropdownMenuItem asChild>
                             <Link href="/dashboard">
                                 <Lock className="mr-2 h-4 w-4" />
