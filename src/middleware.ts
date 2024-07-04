@@ -20,10 +20,13 @@ export default auth((req) => {
     const user = req.auth?.user;
     const isLoggedIn = !!req.auth;
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-    const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+    // const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
     const isAuthRoute1 = authRoutes1.includes(nextUrl.pathname);
     const isAuthRoute2 = authRoutes2.includes(nextUrl.pathname);
     const isDashboard = nextUrl.pathname.startsWith(DEFAULT_REGISTER_REDIRECT);
+    const isPublicRoute = publicRoutes.some((route) =>
+        nextUrl.pathname.startsWith(route)
+    );
 
     if (isApiAuthRoute) {
         return undefined;

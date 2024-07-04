@@ -1,11 +1,11 @@
 export const publicRoutes = [
     '/',
-    '/jobs',
+    '/jobs/:path*',
     '/services',
     '/contact',
     '/faqs',
-    '/categories',
-    '/recruiter',
+    '/categories/:path*',
+    '/recruiter/:path*',
 ];
 
 export const authRoutes1 = ['/login'];
