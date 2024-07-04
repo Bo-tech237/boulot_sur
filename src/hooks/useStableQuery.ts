@@ -1,5 +1,4 @@
-import { useQuery } from 'convex-helpers/react/cache/hooks';
-import { usePaginatedQuery } from 'convex/react';
+import { usePaginatedQuery, useQuery } from 'convex/react';
 import { useRef } from 'react';
 
 export const useStableQuery = ((name, ...args) => {
