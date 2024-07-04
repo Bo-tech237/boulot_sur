@@ -4,9 +4,7 @@ import H1 from '@/components/ui/h1';
 import SearchBar from '@/components/SearchBar';
 
 export const metadata: Metadata = {
-    title: 'All Jobs',
-
-    description: 'Find your dream job in Cameroon!',
+    title: 'Jobs',
 };
 
 type Props = {

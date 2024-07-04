@@ -12,19 +12,21 @@ import { asyncMap } from 'convex-helpers';
 export const getAllRecruiters = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const recruiters = await ctx.db
+            .query('recruiters')
+            .order('desc')
+            .collect();
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
-        }
+        const recruitersWithUsers = await asyncMap(
+            recruiters,
+            async (recruiter) => {
+                const user = await ctx.db.get(recruiter?.userId!);
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+                return { recruiter, user };
+            }
+        );
 
-        if (user?.role !== 'recruiter') {
-            return { success: false, message: 'You must be a recruiter' };
-        }
-
-        return await ctx.db.query('recruiters').order('desc').collect();
+        return recruitersWithUsers;
     },
 });
 

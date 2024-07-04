@@ -1,5 +1,14 @@
-import React from 'react';
+import { Metadata } from 'next';
+import AllRecruiters from './AllRecruiters';
+
+export const metadata: Metadata = {
+    title: 'Recruiters',
+};
 
 export default function RecruitersPage() {
-    return <div>RecruitersPage</div>;
+    return (
+        <div>
+            <AllRecruiters />
+        </div>
+    );
 }

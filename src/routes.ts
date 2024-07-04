@@ -6,6 +6,7 @@ export const publicRoutes = [
     '/faqs',
     '/categories/:path*',
     '/recruiter/:path*',
+    '/recruiters/:path*',
 ];
 
 export const authRoutes1 = ['/login'];

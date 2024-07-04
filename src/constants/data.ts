@@ -58,7 +58,7 @@ export const navLinks = [
     { title: 'Home', href: '/' },
     { title: 'Jobs', href: '/jobs' },
     { title: 'Categories', href: '/categories' },
-    { title: 'Contact', href: '/contact' },
+    { title: 'Recruiters', href: '/recruiters' },
 ];
 
 export const authLinks = [

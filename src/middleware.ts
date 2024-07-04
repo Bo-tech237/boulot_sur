@@ -45,7 +45,9 @@ export default auth((req) => {
     }
 
     if (isDashboard) {
-        if (isLoggedIn && user?.role === 'user') {
+        if (!isLoggedIn) {
+            return Response.redirect(new URL('/login', nextUrl));
+        } else if (isLoggedIn && user?.role === 'user') {
             return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
         }
     }
