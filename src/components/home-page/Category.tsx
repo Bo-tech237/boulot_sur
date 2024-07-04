@@ -1,15 +1,9 @@
-import { api } from '../../../convex/_generated/api';
-import { preloadQuery } from 'convex/nextjs';
-import CategoryList from '../CategoryList';
+import CategoryListHome from '../CategoryListHome';
 
-export default async function Category() {
-    const preloadedCategories = await preloadQuery(
-        api.categories.getAllCategories
-    );
-
+export default async function CategoryHomePage() {
     return (
         <section className="">
-            <CategoryList preloadedCategories={preloadedCategories} />
+            <CategoryListHome />
         </section>
     );
 }

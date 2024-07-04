@@ -57,7 +57,7 @@ export const jobTypes = ['Full-time', 'Internship', 'Part-time', 'Contract'];
 export const navLinks = [
     { title: 'Home', href: '/' },
     { title: 'Jobs', href: '/jobs' },
-    { title: 'Services', href: '/services' },
+    { title: 'Categories', href: '/categories' },
     { title: 'Contact', href: '/contact' },
 ];
 

@@ -82,6 +82,48 @@ export const getAllRecruiterJobs = query({
     },
 });
 
+export const getJobsByCategory = query({
+    args: { categoryId: v.id('categories') },
+    handler: async (ctx, args) => {
+        const category = await ctx.db.get(args.categoryId);
+
+        if (!category) return null;
+
+        const jobs = await ctx.db
+            .query('jobs')
+            .withIndex('byCategory', (q) => q.eq('category', category.name))
+            .order('desc')
+            .collect();
+
+        return { jobs, category };
+    },
+});
+
+export const getAllRecruiterJobsWithoutId = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await ctx.auth.getUserIdentity();
+
+        if (identity === null) {
+            throw new Error('You are not logged in');
+        }
+
+        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+
+        if (user?.role !== 'recruiter') {
+            return;
+        }
+
+        const jobs = await ctx.db
+            .query('jobs')
+            .withIndex('byUserId', (q) => q.eq('userId', user._id))
+            .order('desc')
+            .collect();
+
+        return jobs;
+    },
+});
+
 export const createJob = mutation({
     args: {
         title: v.string(),

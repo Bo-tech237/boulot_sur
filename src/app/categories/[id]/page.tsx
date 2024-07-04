@@ -1,4 +1,5 @@
 import React from 'react';
+import JobsByCategory from './JobsByCategory';
 
 type Props = {
     params: { id: string };
@@ -9,8 +10,7 @@ export default function CategoryJobsPage({ params }: Props) {
 
     return (
         <div>
-            <h1>All Category Jobs Here</h1>
-            Coming soon, here is the id: {id}
+            <JobsByCategory id={id} />
         </div>
     );
 }

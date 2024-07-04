@@ -5,9 +5,6 @@ import { DataTable } from './data-table';
 import { columns } from './columns';
 import { Metadata } from 'next';
 import { api } from '../../../../../convex/_generated/api';
-import { Id } from '../../../../../convex/_generated/dataModel';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useStableQuery } from '@/hooks/useStableQuery';
 
 // export const metadata: Metadata = {
@@ -17,18 +14,7 @@ import { useStableQuery } from '@/hooks/useStableQuery';
 // };
 
 function MyJobs() {
-    const { data: session } = useSession();
-    const router = useRouter();
-    if (!session) router.push('/login');
-
-    const jobs = useStableQuery(
-        api.jobs.getAllRecruiterJobs,
-        session
-            ? {
-                  userId: session?.user.id as Id<'users'>,
-              }
-            : 'skip'
-    );
+    const jobs = useStableQuery(api.jobs.getAllRecruiterJobsWithoutId);
 
     if (jobs === undefined) {
         return (
@@ -40,8 +26,8 @@ function MyJobs() {
 
     return (
         <div className="w-full py-10">
-            {jobs?.length > 0 && <DataTable columns={columns} data={jobs} />}
-            {jobs?.length === 0 && (
+            {jobs !== null && <DataTable columns={columns} data={jobs} />}
+            {jobs === null && (
                 <div className="text-red-600 text-xl">No jobs found</div>
             )}
         </div>

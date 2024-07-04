@@ -3,12 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { FileStack } from 'lucide-react';
+import { ArrowRight, FileStack } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useStableQuery } from '@/hooks/useStableQuery';
 
-export default function CategoryList() {
-    const categoriesResults = useStableQuery(api.categories.getAllCategories);
+export default function CategoryListHome() {
+    const categoriesResults = useStableQuery(api.categories.getHomeCategories);
 
     if (categoriesResults === undefined) {
         return (
@@ -64,6 +64,17 @@ export default function CategoryList() {
                                 </Link>
                             </div>
                         ))}
+                </div>
+
+                <div className="mt-12 text-center transition-all duration-500 ease-in-out hover:-translate-y-2">
+                    <Button>
+                        <Link
+                            href="/categories"
+                            className="flex gap-1 font-bold"
+                        >
+                            All Categories <ArrowRight />
+                        </Link>
+                    </Button>
                 </div>
             </div>
         </div>

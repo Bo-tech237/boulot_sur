@@ -6,7 +6,7 @@ import { columns } from './columns';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { api } from '../../../../../convex/_generated/api';
-import { useConvexAuth, useQuery } from 'convex/react';
+import { useStableQuery } from '@/hooks/useStableQuery';
 
 // export const metadata: Metadata = {
 //     title: 'Applications',
@@ -15,7 +15,7 @@ import { useConvexAuth, useQuery } from 'convex/react';
 // };
 
 function Application() {
-    const applications = useQuery(api.applications.getAllApplictions);
+    const applications = useStableQuery(api.applications.getAllApplictions);
 
     if (applications === undefined) {
         return (
