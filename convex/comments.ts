@@ -14,6 +14,12 @@ export const getAllComments = query({
         return await ctx.db.query('comments').order('desc').collect();
     },
 });
+export const getRecruiterReviews = query({
+    args: {},
+    handler: async (ctx, args) => {
+        return await ctx.db.query('comments').order('desc').collect();
+    },
+});
 
 export const getCommentByUserId = query({
     args: { userId: v.id('users'), jobId: v.id('jobs') },

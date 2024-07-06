@@ -104,9 +104,9 @@ function DashboardNav() {
                             <span className="sr-only">Acme Inc</span>
                         </Link>
                         {session?.user?.role === 'recruiter'
-                            ? recruiterNavItems.map((item, index) => {
+                            ? recruiterNavItems.map((item) => {
                                   return (
-                                      <SheetClose key={index} asChild>
+                                      <SheetClose key={item.title} asChild>
                                           <Link
                                               href={item.href}
                                               className={cn(
@@ -128,9 +128,9 @@ function DashboardNav() {
                                       </SheetClose>
                                   );
                               })
-                            : applicantNavItems.map((item, index) => {
+                            : applicantNavItems.map((item) => {
                                   return (
-                                      <SheetClose key={index}>
+                                      <SheetClose key={item.title} asChild>
                                           <Link
                                               href={item.href}
                                               className={cn(
@@ -166,28 +166,6 @@ function DashboardNav() {
                         />
                     </div>
                 </form>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="rounded-full"
-                        >
-                            <CircleUser className="h-5 w-5" />
-                            <span className="sr-only">Toggle user menu</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                        <DropdownMenuItem>Support</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <Link href="/logout">Sign Out</Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
         </header>
     );

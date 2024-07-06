@@ -45,7 +45,7 @@ function AddNewJob() {
         next,
     } = useRecruiterAddStepForm([
         <RecruiterAddJobForm1 {...form} />,
-        <RecruiterAddJobForm2 form={form} categories={categories} />,
+        <RecruiterAddJobForm2 form={form} categories={categories!} />,
         <RecruiterAddJobForm3 {...form} />,
     ]);
 

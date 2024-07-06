@@ -8,7 +8,9 @@ import { api } from '../../convex/_generated/api';
 import { useStableQuery } from '@/hooks/useStableQuery';
 
 export default function CategoryList() {
-    const categoriesResults = useStableQuery(api.categories.getAllCategories);
+    const categoriesResults = useStableQuery(
+        api.categories.getCategoriesWithTotalJobs
+    );
 
     if (categoriesResults === undefined) {
         return (

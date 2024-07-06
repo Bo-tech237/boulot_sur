@@ -18,6 +18,18 @@ export const getAllCategories = query({
             .order('desc')
             .collect();
 
+        return categories;
+    },
+});
+
+export const getCategoriesWithTotalJobs = query({
+    args: {},
+    handler: async (ctx) => {
+        const categories = await ctx.db
+            .query('categories')
+            .order('desc')
+            .collect();
+
         const categoryWithTotalJobs = await asyncMap(
             categories,
             async (category) => {
