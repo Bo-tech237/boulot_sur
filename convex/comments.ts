@@ -26,7 +26,7 @@ export const getRecruiterReviews = query({
             const comment = await ctx.db
                 .query('comments')
                 .withIndex('byUserId', (q) =>
-                    q.eq('userId', rating.applicantId)
+                    q.eq('userId', rating.recruiterId)
                 )
                 .first();
 
@@ -54,7 +54,7 @@ export const getApplicantReviews = query({
             const comment = await ctx.db
                 .query('comments')
                 .withIndex('byUserId', (q) =>
-                    q.eq('userId', rating.recruiterId)
+                    q.eq('userId', rating.applicantId)
                 )
                 .first();
 

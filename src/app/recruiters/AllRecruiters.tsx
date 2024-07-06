@@ -12,7 +12,7 @@ export default function AllRecruiters() {
     if (recruitersWithUsers === undefined) {
         return (
             <div className="flex py-5 items-center justify-center">
-                Loading Jobs...
+                Loading Recruiters...
             </div>
         );
     }
