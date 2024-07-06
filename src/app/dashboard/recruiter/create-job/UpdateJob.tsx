@@ -97,13 +97,13 @@ function UpdateJob({ job }: UpdateJobprops) {
             <Card>
                 <CardHeader>
                     <CardTitle>
-                        <div className="flex gap-2 justify-between">
+                        <div className="flex gap-1 justify-between">
                             <Progress
                                 value={
                                     ((currentStepIndex + 1) / steps.length) *
                                     100
                                 }
-                                className="w-[80%]"
+                                className="w-[60%] h-6 md:w-[80%] md:h-7"
                             />
                             {currentStepIndex + 1} / {steps.length}
                         </div>

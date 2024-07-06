@@ -30,9 +30,9 @@ function RecruiterProfile({ session }: Props) {
     return (
         <div className="w-full py-10">
             <div>
-                <div className="flex flex-wrap gap-1 justify-between mb-5">
+                <div className="flex flex-wrap gap-2 justify-between mb-5">
                     <DeleteRecruitersDialog id={recruiter?.userId!}>
-                        <Button>Delete Profile</Button>
+                        <Button>Delete Account</Button>
                     </DeleteRecruitersDialog>
 
                     <Button asChild>

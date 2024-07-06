@@ -13,13 +13,27 @@ export default function ApplicantProfile({ id }: { id: string }) {
         userId: id as Id<'users'>,
     });
 
+    const applicantReviews = useStableQuery(api.comments.getApplicantReviews, {
+        userId: id as Id<'users'>,
+    });
+
     if (applicant === undefined) {
         return (
-            <div className="flex h-screen items-center justify-center">
+            <div className="flex py-10 items-center justify-center">
                 Loading Applicant...
             </div>
         );
     }
+
+    if (applicantReviews === undefined) {
+        return (
+            <div className="flex py-10 items-center justify-center">
+                Loading Applicant...
+            </div>
+        );
+    }
+
+    console.log('applicantReviews:', applicantReviews);
 
     return (
         <div>

@@ -12,14 +12,27 @@ export default function RecruiterProfile({ id }: { id: string }) {
     const recruiter = useStableQuery(api.recruiters.getRecruiterById, {
         userId: id as Id<'users'>,
     });
+    const recruiterReviews = useStableQuery(api.comments.getRecruiterReviews, {
+        userId: id as Id<'users'>,
+    });
 
     if (recruiter === undefined) {
         return (
-            <div className="flex h-screen items-center justify-center">
+            <div className="flex py-10 items-center justify-center">
                 Loading Recruiter...
             </div>
         );
     }
+
+    if (recruiterReviews === undefined) {
+        return (
+            <div className="flex py-10 items-center justify-center">
+                Loading Reviews...
+            </div>
+        );
+    }
+
+    console.log('recruiterReviews:', recruiterReviews);
 
     return (
         <div>

@@ -7,6 +7,7 @@ import {
     getManyFrom,
     getManyVia,
 } from 'convex-helpers/server/relationships';
+import { asyncMap } from 'convex-helpers';
 
 export const getAllComments = query({
     args: {},
@@ -14,10 +15,60 @@ export const getAllComments = query({
         return await ctx.db.query('comments').order('desc').collect();
     },
 });
+
 export const getRecruiterReviews = query({
-    args: {},
+    args: { userId: v.id('users') },
     handler: async (ctx, args) => {
-        return await ctx.db.query('comments').order('desc').collect();
+        const ratings = await ctx.db
+            .query('ratings')
+            .withIndex('by_RecruiterId_Category', (q) =>
+                q.eq('recruiterId', args.userId).eq('category', 'applicant')
+            )
+            .order('desc')
+            .collect();
+
+        const reviews = await asyncMap(ratings, async (rating) => {
+            const users = await ctx.db.get(rating.applicantId);
+
+            const comments = await ctx.db
+                .query('comments')
+                .withIndex('byUserId', (q) =>
+                    q.eq('userId', rating.applicantId)
+                )
+                .collect();
+
+            return { rating, comments, users };
+        });
+
+        return reviews;
+    },
+});
+
+export const getApplicantReviews = query({
+    args: { userId: v.id('users') },
+    handler: async (ctx, args) => {
+        const ratings = await ctx.db
+            .query('ratings')
+            .withIndex('by_Applicant_Category', (q) =>
+                q.eq('applicantId', args.userId).eq('category', 'job')
+            )
+            .order('desc')
+            .collect();
+
+        const reviews = await asyncMap(ratings, async (rating) => {
+            const users = await ctx.db.get(rating.recruiterId);
+
+            const comments = await ctx.db
+                .query('comments')
+                .withIndex('byUserId', (q) =>
+                    q.eq('userId', rating.recruiterId)
+                )
+                .collect();
+
+            return { rating, comments, users };
+        });
+
+        return reviews;
     },
 });
 

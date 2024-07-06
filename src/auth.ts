@@ -16,7 +16,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/login',
         error: '/login',
     },
-    providers: [Google({ allowDangerousEmailAccountLinking: true })],
+    providers: [Google],
     adapter: ConvexAdapter,
     callbacks: {
         async signIn({ user }) {

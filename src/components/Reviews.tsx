@@ -62,6 +62,8 @@ export default function Reviews({
     const updateRatings = useMutation(api.ratings.updateRatings);
     const { toast } = useToast();
 
+    console.log('userComent:', comment, 'userRating:', rating);
+
     const form = useForm<commentTypes>({
         resolver: zodResolver(commentSchema),
         defaultValues: {
