@@ -52,9 +52,7 @@ export default function Reviews({
         recruiterId: application.recruiterId as Id<'users'>,
         userId: application.userId as Id<'users'>,
     });
-    const [activeStar, setActiveStar] = useState(
-        rating?.ratings! > 0 ? rating?.ratings : -1
-    );
+    const [activeStar, setActiveStar] = useState(-1);
     const [hoverActiveStar, setHoverActiveStar] = useState(-1);
     const [isHovered, setIsHovered] = useState(false);
     const ratingContainerRef = useRef<HTMLDivElement>(null);
@@ -116,6 +114,15 @@ export default function Reviews({
         console.log(value, activeStar);
 
         try {
+            if (comment === undefined || rating === undefined) {
+                return (
+                    <div className="flex py-10 items-center justify-center">
+                        Loading Reviews...
+                    </div>
+                );
+            }
+            setActiveStar(rating?.ratings!);
+
             if (comment) {
                 const result = await updateRatings({
                     rating: activeStar!,
@@ -129,7 +136,7 @@ export default function Reviews({
                 }
 
                 const updatedComment = await updateComment({
-                    commentId: comment._id,
+                    commentId: comment?._id!,
                     text: value.text,
                 });
 

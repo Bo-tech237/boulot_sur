@@ -1,12 +1,5 @@
-import { Id } from './_generated/dataModel';
 import { query, mutation } from './_generated/server';
 import { ConvexError, v } from 'convex/values';
-import {
-    getAll,
-    getOneFrom,
-    getManyFrom,
-    getManyVia,
-} from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
 
 export const getAllComments = query({
@@ -22,22 +15,22 @@ export const getRecruiterReviews = query({
         const ratings = await ctx.db
             .query('ratings')
             .withIndex('by_RecruiterId_Category', (q) =>
-                q.eq('recruiterId', args.userId).eq('category', 'applicant')
+                q.eq('recruiterId', args.userId).eq('category', 'job')
             )
             .order('desc')
             .collect();
 
         const reviews = await asyncMap(ratings, async (rating) => {
-            const users = await ctx.db.get(rating.applicantId);
+            const user = await ctx.db.get(rating.applicantId);
 
-            const comments = await ctx.db
+            const comment = await ctx.db
                 .query('comments')
                 .withIndex('byUserId', (q) =>
                     q.eq('userId', rating.applicantId)
                 )
-                .collect();
+                .first();
 
-            return { rating, comments, users };
+            return { rating, comment, user };
         });
 
         return reviews;
@@ -50,22 +43,22 @@ export const getApplicantReviews = query({
         const ratings = await ctx.db
             .query('ratings')
             .withIndex('by_Applicant_Category', (q) =>
-                q.eq('applicantId', args.userId).eq('category', 'job')
+                q.eq('applicantId', args.userId).eq('category', 'applicant')
             )
             .order('desc')
             .collect();
 
         const reviews = await asyncMap(ratings, async (rating) => {
-            const users = await ctx.db.get(rating.recruiterId);
+            const user = await ctx.db.get(rating.recruiterId);
 
-            const comments = await ctx.db
+            const comment = await ctx.db
                 .query('comments')
                 .withIndex('byUserId', (q) =>
                     q.eq('userId', rating.recruiterId)
                 )
-                .collect();
+                .first();
 
-            return { rating, comments, users };
+            return { rating, comment, user };
         });
 
         return reviews;
