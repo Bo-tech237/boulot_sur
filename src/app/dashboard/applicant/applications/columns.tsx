@@ -126,7 +126,7 @@ export const columns: ColumnDef<ApplicationDataType>[] = [
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <Link href={`/recruiter/${data.userId}`}>
+                            <Link href={`/recruiter/${data.recruiterId}`}>
                                 Recruiter Profile
                             </Link>
                         </DropdownMenuItem>

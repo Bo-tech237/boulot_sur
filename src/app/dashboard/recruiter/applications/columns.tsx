@@ -153,7 +153,7 @@ export const columns: ColumnDef<ApplicationDataType>[] = [
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <Link href={`/applicant/${data?.userId}`}>
+                            <Link href={`/applicant/${data?.applicantId}`}>
                                 Applicant Profile
                             </Link>
                         </DropdownMenuItem>

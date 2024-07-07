@@ -55,10 +55,7 @@ export default function Testimonials() {
                         href="#"
                         className="mt-6 inline-flex shrink-0 items-center gap-2 rounded-full border border-rose-600 px-5 py-3 text-rose-600 transition hover:bg-rose-600 hover:text-white md:mt-0"
                     >
-                        <span className="font-medium">
-                            {' '}
-                            Read all bestReviews{' '}
-                        </span>
+                        <span className="font-medium"> Read all reviews </span>
                         <ArrowRight size={20} />
                     </Link>
                 </div>
