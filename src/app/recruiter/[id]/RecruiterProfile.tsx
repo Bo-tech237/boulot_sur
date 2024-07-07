@@ -7,6 +7,7 @@ import Hero from './Hero';
 import LeftContent from '../../../components/recruiter-details/LeftContent';
 import RightContent from '../../../components/recruiter-details/RightContent';
 import { useStableQuery } from '@/hooks/useStableQuery';
+import UserTestimonials from '@/components/UserTestimonials';
 
 export default function RecruiterProfile({ id }: { id: string }) {
     const recruiter = useStableQuery(api.recruiters.getRecruiterById, {
@@ -46,6 +47,7 @@ export default function RecruiterProfile({ id }: { id: string }) {
                             <LeftContent recruiter={recruiter} />
                             <RightContent recruiter={recruiter} />
                         </div>
+                        <UserTestimonials reviews={recruiterReviews} />
                     </div>
                 </section>
             </div>

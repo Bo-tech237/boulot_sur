@@ -173,6 +173,7 @@ export default defineSchema({
     })
         .index('byApplicantId', ['applicantId'])
         .index('byRecruiterId', ['recruiterId'])
+        .index('byJobId', ['jobId'])
         .index('by_RecruiterId_Category', ['recruiterId', 'category'])
         .index('by_ApplicantId_Recruiter_JobId_Category', [
             'applicantId',

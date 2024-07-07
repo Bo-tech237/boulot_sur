@@ -7,6 +7,7 @@ import Hero from './Hero';
 import LeftContent from '../../../components/applicant-details/LeftContent';
 import RightContent from '../../../components/applicant-details/RightContent';
 import { useStableQuery } from '@/hooks/useStableQuery';
+import UserTestimonials from '@/components/UserTestimonials';
 
 export default function ApplicantProfile({ id }: { id: string }) {
     const applicant = useStableQuery(api.applicants.getApplicantById, {
@@ -28,7 +29,7 @@ export default function ApplicantProfile({ id }: { id: string }) {
     if (applicantReviews === undefined) {
         return (
             <div className="flex py-10 items-center justify-center">
-                Loading Applicant...
+                Loading Reviews...
             </div>
         );
     }
@@ -47,6 +48,7 @@ export default function ApplicantProfile({ id }: { id: string }) {
                             <LeftContent applicant={applicant} />
                             <RightContent applicant={applicant} />
                         </div>
+                        <UserTestimonials reviews={applicantReviews} />
                     </div>
                 </section>
             </div>

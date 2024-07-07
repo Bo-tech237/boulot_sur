@@ -117,7 +117,7 @@ export const columns: ColumnDef<ApplicationDataType>[] = [
             const application = row.original;
 
             const data = {
-                userId: application?.applicantId,
+                userId: application?.recruiterId,
                 applicantId: application.applicantId,
                 recruiterId: application.recruiterId,
                 jobId: application.jobId,

@@ -2,10 +2,38 @@ import { query, mutation } from './_generated/server';
 import { ConvexError, v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
 
-export const getAllComments = query({
+export const getBestReviews = query({
     args: {},
     handler: async (ctx, args) => {
-        return await ctx.db.query('comments').order('desc').collect();
+        const comments = await ctx.db.query('comments').order('desc').take(5);
+
+        const reviews = await asyncMap(comments, async (comment) => {
+            const user = await ctx.db.get(comment.userId);
+
+            const rating = await ctx.db
+                .query('ratings')
+                .withIndex('byJobId', (q) => q.eq('jobId', comment.jobId))
+                .filter((q) =>
+                    q.and(
+                        q.gte(q.field('ratings'), 3),
+                        q.or(
+                            q.and(
+                                q.eq(q.field('applicantId'), comment.userId),
+                                q.eq(q.field('category'), 'job')
+                            ),
+                            q.and(
+                                q.eq(q.field('recruiterId'), comment.userId),
+                                q.eq(q.field('category'), 'applicant')
+                            )
+                        )
+                    )
+                )
+                .first();
+
+            return { rating, comment, user };
+        });
+
+        return reviews;
     },
 });
 
@@ -18,7 +46,7 @@ export const getRecruiterReviews = query({
                 q.eq('recruiterId', args.userId).eq('category', 'job')
             )
             .order('desc')
-            .collect();
+            .take(5);
 
         const reviews = await asyncMap(ratings, async (rating) => {
             const user = await ctx.db.get(rating.applicantId);
@@ -26,7 +54,7 @@ export const getRecruiterReviews = query({
             const comment = await ctx.db
                 .query('comments')
                 .withIndex('byUserId', (q) =>
-                    q.eq('userId', rating.recruiterId)
+                    q.eq('userId', rating.applicantId)
                 )
                 .first();
 
@@ -46,7 +74,7 @@ export const getApplicantReviews = query({
                 q.eq('applicantId', args.userId).eq('category', 'applicant')
             )
             .order('desc')
-            .collect();
+            .take(5);
 
         const reviews = await asyncMap(ratings, async (rating) => {
             const user = await ctx.db.get(rating.recruiterId);
@@ -54,7 +82,7 @@ export const getApplicantReviews = query({
             const comment = await ctx.db
                 .query('comments')
                 .withIndex('byUserId', (q) =>
-                    q.eq('userId', rating.applicantId)
+                    q.eq('userId', rating.recruiterId)
                 )
                 .first();
 

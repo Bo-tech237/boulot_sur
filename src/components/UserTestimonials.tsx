@@ -12,26 +12,17 @@ import Autoplay from 'embla-carousel-autoplay';
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { useStableQuery } from '@/hooks/useStableQuery';
-import { api } from '../../../convex/_generated/api';
-import { ShowRating } from '../ui/showRating';
+import { Testimonials } from '@/types/testimonials';
+import { ShowRating } from './ui/showRating';
 
-export default function Testimonials() {
-    const bestReviews = useStableQuery(api.comments.getBestReviews);
-
+export default function UserTestimonials({
+    reviews,
+}: {
+    reviews: Testimonials;
+}) {
     const plugin = React.useRef(
         Autoplay({ delay: 2000, stopOnInteraction: false })
     );
-
-    if (bestReviews === undefined) {
-        return (
-            <div className="flex py-10 items-center justify-center">
-                Loading Reviews...
-            </div>
-        );
-    }
-
-    console.log('bestReviews:', bestReviews);
 
     return (
         <section className="container">
@@ -39,7 +30,7 @@ export default function Testimonials() {
                 <div className="mb-5 md:flex md:items-end md:justify-between">
                     <div className="max-w-xl">
                         <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                            Read trusted bestReviews from our customers
+                            Read trusted reviews from our customers
                         </h2>
 
                         <p className="mt-6 max-w-lg leading-relaxed">
@@ -55,10 +46,7 @@ export default function Testimonials() {
                         href="#"
                         className="mt-6 inline-flex shrink-0 items-center gap-2 rounded-full border border-rose-600 px-5 py-3 text-rose-600 transition hover:bg-rose-600 hover:text-white md:mt-0"
                     >
-                        <span className="font-medium">
-                            {' '}
-                            Read all bestReviews{' '}
-                        </span>
+                        <span className="font-medium"> Read all reviews </span>
                         <ArrowRight size={20} />
                     </Link>
                 </div>
@@ -75,10 +63,10 @@ export default function Testimonials() {
                         className="w-full"
                     >
                         <CarouselContent>
-                            {bestReviews &&
-                                bestReviews.map((review) => (
+                            {reviews &&
+                                reviews.map((review) => (
                                     <CarouselItem
-                                        key={review.rating?._id}
+                                        key={review.rating._id}
                                         className="md:basis-1/2 lg:basis-1/3"
                                     >
                                         <div className="p-1">
@@ -88,7 +76,7 @@ export default function Testimonials() {
                                                         <ShowRating
                                                             userRating={
                                                                 review.rating
-                                                                    ?.ratings
+                                                                    .ratings
                                                             }
                                                         />
                                                     </span>
@@ -110,7 +98,7 @@ export default function Testimonials() {
                                 ))}
                         </CarouselContent>
                     </Carousel>
-                    {bestReviews.length === 0 && (
+                    {reviews.length === 0 && (
                         <div className="text-red-600 text-center text-2xl mt-10">
                             No reviews for now
                         </div>
