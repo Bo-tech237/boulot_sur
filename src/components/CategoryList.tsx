@@ -57,7 +57,7 @@ export default function CategoryList() {
 
                                             <p className="mt-1 font-medium">
                                                 {categoryResult.totalJobs}{' '}
-                                                {categoryResult.totalJobs > 0
+                                                {categoryResult.totalJobs > 1
                                                     ? 'Jobs'
                                                     : 'Job'}
                                             </p>

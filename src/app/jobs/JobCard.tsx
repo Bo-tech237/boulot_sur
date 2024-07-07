@@ -13,26 +13,10 @@ import Link from 'next/link';
 import { formatMoney, relativeDate } from '@/lib/friendly-time';
 import { ShowRating } from '@/components/ui/showRating';
 import { Doc } from '../../../convex/_generated/dataModel';
-import { useStableQuery } from '@/hooks/useStableQuery';
-import { api } from '../../../convex/_generated/api';
 
 type Props = { job: Doc<'jobs'> };
 
 function JobCard({ job }: Props) {
-    const recruiterReviews = useStableQuery(api.comments.getRecruiterReviews, {
-        userId: job.userId,
-    });
-
-    if (recruiterReviews === undefined) {
-        return (
-            <div className="flex py-10 items-center justify-center">
-                Loading Reviews...
-            </div>
-        );
-    }
-
-    console.log('recruiterReviews:', recruiterReviews);
-
     return (
         <>
             <Card>
