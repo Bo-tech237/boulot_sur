@@ -44,7 +44,7 @@ export function relativeDate(from: Date) {
 }
 
 export function formatMoney(amount: number) {
-    return new Intl.NumberFormat('fr-CEMAC', {
+    return new Intl.NumberFormat('fr-CM', {
         style: 'currency',
         currency: 'XAF',
     }).format(amount);
