@@ -14,23 +14,25 @@ export class Emailer {
         });
     }
 
-    public sendEmail(mailOptions: MailOptions) {
-        return this.transporter.sendMail(mailOptions);
+    public async sendEmail(mailOptions: MailOptions) {
+        return await this.transporter.sendMail(mailOptions);
     }
 
-    public notifyAdminForNewUser(email: string, username: string) {
-        this.sendEmail(notifyAdminNewUserEmailTemplate(email, username));
+    public async notifyAdminForNewUser(email: string, username: string) {
+        return await this.sendEmail(
+            notifyAdminNewUserEmailTemplate(email, username)
+        );
     }
 
-    public notifyUserForSignup(email: string, username: string) {
-        this.sendEmail(newUserEmailTemplate(email, username));
+    public async notifyUserForSignup(email: string, username: string) {
+        return await this.sendEmail(newUserEmailTemplate(email, username));
     }
 
-    public notifyUserForDeletedAccount(
+    public async notifyUserForDeletedAccount(
         email: string | null | undefined,
         username: string | null | undefined
     ) {
-        this.sendEmail(deleteUserEmailTemplate(email, username));
+        return await this.sendEmail(deleteUserEmailTemplate(email, username));
     }
 }
 

@@ -107,6 +107,33 @@ export const footerInfos = [
     },
 ];
 
+export const whyChooseUs = [
+    {
+        title: 'User-Friendly Interface',
+        text: 'Easily navigate through job listings with our intuitive design.',
+    },
+    {
+        title: 'Verified Employers',
+        text: 'We ensure all job postings come from credible sources.',
+    },
+    {
+        title: 'Advanced Filters',
+        text: 'Find jobs that match your skills and preferences.',
+    },
+    {
+        title: 'Quick Apply',
+        text: 'Apply to jobs directly through our platform.',
+    },
+    {
+        title: 'Career Resources',
+        text: 'Access tips and guides for job applications.',
+    },
+    {
+        title: 'Job Alerts',
+        text: 'Get notified of new job postings instantly.',
+    },
+];
+
 const category = [
     'Academic librarian',
     'Accountant',

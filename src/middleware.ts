@@ -8,13 +8,6 @@ import {
     authRoutes2,
 } from './routes';
 
-// export default auth((req) => {
-//     if (!req.auth) {
-//         const url = req.url.replace(req.nextUrl.pathname, '/');
-//         return Response.redirect(url);
-//     }
-// });
-
 export default auth((req) => {
     const { nextUrl } = req;
     const user = req.auth?.user;

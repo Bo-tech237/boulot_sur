@@ -27,14 +27,14 @@ function NavBar() {
     const user = session?.user;
 
     return (
-        <header className="flex h-20 items-center justify-between">
-            <div className="md:flex md:items-center md:justify-center md:gap-12">
-                <Link className="block bg-zinc-100 rounded-full" href="/">
+        <header className="flex h-20 gap-1 items-center justify-between">
+            <div>
+                <Link className="block" href="/">
                     <span className="sr-only">Home</span>
                     <Image
-                        src={'/logo-transparent.png'}
+                        src={'/logo-transparent.svg'}
                         alt="Boulot Sur"
-                        width={100}
+                        width={150}
                         height={150}
                         priority
                     />
@@ -42,7 +42,7 @@ function NavBar() {
             </div>
 
             <section className="hidden md:block">
-                <nav className="flex items-center justify-center gap-3">
+                <nav className="flex items-center text-white justify-center gap-2">
                     {navLinks.map((navLink) => (
                         <Link
                             key={navLink.title}
@@ -64,8 +64,8 @@ function NavBar() {
                 </nav>
             </section>
 
-            <section className="flex items-center gap-4">
-                <div className="sm:flex sm:gap-4">
+            <section className="flex items-center gap-2">
+                <div className="sm:flex sm:gap-4 text-white">
                     {authLinks.map((authLink) =>
                         authLink.href === '/login' ? (
                             <div key={authLink.title}>

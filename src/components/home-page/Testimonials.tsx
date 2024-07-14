@@ -39,7 +39,7 @@ export default function Testimonials() {
                 <div className="mb-5 md:flex md:items-end md:justify-between">
                     <div className="max-w-xl">
                         <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                            Read trusted bestReviews from our customers
+                            Read trusted reviews from our customers
                         </h2>
 
                         <p className="mt-6 max-w-lg leading-relaxed">

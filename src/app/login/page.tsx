@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default async function LoginPage() {
     return (
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-screen bg-boulotRed">
             <SignIn />
         </div>
     );

@@ -20,7 +20,7 @@ export default function JobsByCategory({ id }: { id: string }) {
     }
 
     return (
-        <div>
+        <div className="py-20">
             <div className="text-center py-10">
                 <H1>
                     {jobsWithCategory?.category !== null &&

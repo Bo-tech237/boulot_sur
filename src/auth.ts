@@ -3,6 +3,7 @@ import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { ConvexAdapter } from '../convex/ConvexAdapter';
 import Nodemailer from 'next-auth/providers/nodemailer';
+import { authConfig } from './auth.config';
 
 const CONVEX_SITE_URL = process.env.CONVEX_SITE_URL;
 
@@ -16,7 +17,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/login',
         error: '/login',
     },
-    providers: [Google],
+    ...authConfig,
     adapter: ConvexAdapter,
     callbacks: {
         async signIn({ user }) {
@@ -31,6 +32,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             );
             const role = user.role;
             const convexToken = await new SignJWT({
+                name: user.name,
+                email: user.email,
+                gender: user.role,
                 sub: session.userId,
             })
                 .setProtectedHeader({ alg: 'RS256' })

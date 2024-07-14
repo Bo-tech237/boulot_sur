@@ -31,39 +31,39 @@ function JobDetail({ id }: Props) {
     }
 
     return (
-        <div className="container">
+        <div className="container mx-auto">
             <div className="flex flex-col gap-5">
                 <H1 className="uppercase">{job?.title}</H1>
-                <div className="w-full flex flex-wrap justify-between gap-2">
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                <div className="w-full flex flex-wrap gap-2 justify-between">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">Max Applicants</span>
                         <p className="">{job?.maxApplicants}</p>
                     </div>
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">Max Positions</span>
                         <p className="">{job?.maxPositions}</p>
                     </div>
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">Location</span>
                         <p className="">{job?.location}</p>
                     </div>
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">Salary</span>
                         <p className="">{formatMoney(job?.salary!)}</p>
                     </div>
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">Applied</span>
                         <p className="">{job?.activeApplications}</p>
                     </div>
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">Accepted</span>
                         <p className="">{job?.acceptedApplicants}</p>
                     </div>
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">JobType</span>
                         <p className="">{job?.type}</p>
                     </div>
-                    <div className="bg-violet-600 w-32 h-16 rounded-lg flex flex-col items-center justify-center">
+                    <div className="bg-bordeaux w-32 text-white h-16 rounded-lg flex flex-col items-center justify-center">
                         <span className="">Rating</span>
                         <p className="">{job?.rating}</p>
                     </div>
@@ -88,7 +88,7 @@ function JobDetail({ id }: Props) {
                         <h1 className="font-bold uppercase mb-3 text-2xl">
                             Category
                         </h1>
-                        <p>
+                        <p className="flex justify-end">
                             <Badge className="p-2 capitalize">
                                 {job?.category}
                             </Badge>

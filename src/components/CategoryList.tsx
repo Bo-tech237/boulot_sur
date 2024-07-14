@@ -46,8 +46,8 @@ export default function CategoryList() {
                                 >
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle className="flex items-center justify-center h-16 w-16 rounded-lg text-center leading-[4.4] mx-auto bg-violet-700">
-                                                <FileStack className="text-zinc-300  dark:text-muted-foreground" />
+                                            <CardTitle className="flex items-center justify-center h-16 w-16 rounded-lg text-center leading-[4.4] mx-auto bg-red-950">
+                                                <FileStack className="text-zinc-300" />
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="flex flex-col items-center">

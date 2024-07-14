@@ -11,21 +11,23 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import Image from 'next/image';
+import MagicLinkAuth from './MagicLinkAuth';
+import { Separator } from './ui/separator';
 
 export default async function SignIn() {
     return (
         <div>
-            <Card className="w-[350px] flex flex-col gap-5 p-5">
+            <Card className="w-[350px] mx-auto bg-boulotGrey flex flex-col gap-5 p-4">
                 <CardHeader>
                     <CardTitle>
                         <div className="flex items-center justify-center md:gap-12">
-                            <Link className="bg-zinc-100 rounded" href="/">
+                            <Link className="" href="/">
                                 <span className="sr-only">Home</span>
                                 <Image
-                                    src={'/logo-transparent.png'}
-                                    alt="Boulot Sur"
-                                    width={150}
-                                    height={150}
+                                    src={'/logo-transparent.svg'}
+                                    alt="logo"
+                                    width={200}
+                                    height={200}
                                     priority
                                 />
                             </Link>
@@ -43,10 +45,16 @@ export default async function SignIn() {
                             <Button type="submit" className="w-full">
                                 Sign In With Google
                             </Button>
-                            <div className="pt-3">
-                                <GoogleSignInError />
-                            </div>
                         </form>
+                    </div>
+                    <div className="flex items-center justify-center gap-1 my-5">
+                        <Separator className="w-[115px]" />
+                        <span className="uppercase text-white">or</span>
+                        <Separator className="w-[115px]" />
+                    </div>
+                    <MagicLinkAuth />
+                    <div className="pt-3">
+                        <GoogleSignInError />
                     </div>
                 </CardContent>
             </Card>
