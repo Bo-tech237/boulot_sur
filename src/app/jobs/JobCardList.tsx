@@ -31,8 +31,8 @@ export default function JobCardList({ search }: { search?: string }) {
             </div>
 
             {(jobs?.length === 0 || !jobs) && (
-                <div className="text-center py-10 text-2xl text-red-600">
-                    No job found
+                <div className="text-center py-10 text-2xl text-red-900">
+                    No job available
                 </div>
             )}
         </div>

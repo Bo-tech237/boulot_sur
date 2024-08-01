@@ -28,7 +28,7 @@ function MyJobs() {
         <div className="w-full py-10">
             {jobs !== null && <DataTable columns={columns} data={jobs} />}
             {jobs === null && (
-                <div className="text-red-600 text-xl">No jobs found</div>
+                <div className="text-red-900 text-xl">No jobs found</div>
             )}
         </div>
     );

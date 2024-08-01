@@ -17,7 +17,7 @@ import { ReactNode, useState, useTransition } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
-import { signOut } from 'next-auth/react';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 type Props = {
     id: Id<'users'>;
@@ -25,6 +25,7 @@ type Props = {
 };
 
 function DeleteApplicantsDialog({ id, children }: Props) {
+    const { signOut } = useAuthActions();
     const deleteApplicant = useMutation(api.applicants.deleteApplicant);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -36,7 +37,7 @@ function DeleteApplicantsDialog({ id, children }: Props) {
 
             console.log('DeleteApplicant', deletedApplicant);
 
-            signOut({ callbackUrl: '/' });
+            signOut();
             toast({
                 variant: 'success',
                 title: deletedApplicant.message,

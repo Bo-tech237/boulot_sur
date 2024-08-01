@@ -1,9 +1,7 @@
 'use client';
 
-import { Session } from 'next-auth';
 import React from 'react';
 import { api } from '../../../../../convex/_generated/api';
-import { Id } from '../../../../../convex/_generated/dataModel';
 import DeleteApplicantsDialog from '@/components/DeleteApplicantsDialog';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -12,20 +10,9 @@ import RightContent from '@/components/applicant-details/RightContent';
 import { usePathname } from 'next/navigation';
 import { useStableQuery } from '@/hooks/useStableQuery';
 
-type Props = {
-    session: Session;
-};
-
-export default function ApplicantProfile({ session }: Props) {
+export default function ApplicantProfile() {
     const pathName = usePathname();
-    const applicant = useStableQuery(
-        api.applicants.getApplicantById,
-        session
-            ? {
-                  userId: session?.user.id as Id<'users'>,
-              }
-            : 'skip'
-    );
+    const applicant = useStableQuery(api.applicants.getApplicant);
 
     if (applicant === undefined) {
         return (
@@ -34,6 +21,8 @@ export default function ApplicantProfile({ session }: Props) {
             </div>
         );
     }
+
+    if (applicant === null) return;
 
     return (
         <div className="w-full py-5">

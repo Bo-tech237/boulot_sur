@@ -63,7 +63,7 @@ export const navLinks = [
 
 export const authLinks = [
     { title: 'Sign in', href: '/login' },
-    { title: 'Admin', href: '/admin' },
+    { title: 'Contact', href: '/contact' },
 ];
 
 export const footerInfos = [

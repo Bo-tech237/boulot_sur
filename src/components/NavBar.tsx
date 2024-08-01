@@ -16,15 +16,12 @@ import {
 } from './ui/sheet';
 import { Menu } from 'lucide-react';
 import { authLinks, navLinks } from '@/constants/data';
-import { useSession } from 'next-auth/react';
 import UserButton from './UserButton';
 import Image from 'next/image';
-import { Badge } from './ui/badge';
+import { Authenticated, Unauthenticated } from 'convex/react';
 
 function NavBar() {
     const pathname = usePathname();
-    const { data: session, update } = useSession();
-    const user = session?.user;
 
     return (
         <header className="flex h-20 gap-1 items-center justify-between">
@@ -69,9 +66,10 @@ function NavBar() {
                     {authLinks.map((authLink) =>
                         authLink.href === '/login' ? (
                             <div key={authLink.title}>
-                                {user ? (
-                                    <UserButton user={user} />
-                                ) : (
+                                <Authenticated>
+                                    <UserButton />
+                                </Authenticated>
+                                <Unauthenticated>
                                     <Link
                                         key={authLink.title}
                                         href={authLink.href}
@@ -89,14 +87,14 @@ function NavBar() {
                                     >
                                         {authLink.title}
                                     </Link>
-                                )}
+                                </Unauthenticated>
                             </div>
                         ) : (
                             <div
                                 className="hidden sm:flex"
                                 key={authLink.title}
                             >
-                                {!user && (
+                                <Unauthenticated>
                                     <Link
                                         key={authLink.title}
                                         href={authLink.href}
@@ -114,7 +112,7 @@ function NavBar() {
                                     >
                                         {authLink.title}
                                     </Link>
-                                )}
+                                </Unauthenticated>
                             </div>
                         )
                     )}

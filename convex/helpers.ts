@@ -1,3 +1,7 @@
+'use node';
+
+import { v } from 'convex/values';
+import { action, internalAction } from './_generated/server';
 import * as nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 
@@ -127,3 +131,28 @@ export const contactAdminEmailTemplate = (
     `,
     } as MailOptions;
 };
+
+export const newUserEmail = action({
+    args: { email: v.string(), name: v.string() },
+    handler: async (ctx, args) => {
+        const newUser = await emailer.notifyAdminForNewUser(
+            args.email,
+            args.name
+        );
+
+        console.log('convex email new User', newUser);
+        return newUser;
+    },
+});
+
+export const deleteUserEmail = action({
+    args: { email: v.string(), name: v.string() },
+    handler: async (ctx, args) => {
+        const deletedUser = await emailer.notifyUserForDeletedAccount(
+            args.email,
+            args.name
+        );
+        console.log('convex email delete User', deletedUser);
+        return deletedUser;
+    },
+});

@@ -1,6 +1,6 @@
-import { Id } from './_generated/dataModel';
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
+import { api, internal } from './_generated/api';
 import {
     getAll,
     getOneFrom,
@@ -8,6 +8,7 @@ import {
     getManyVia,
 } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
+import { auth } from './auth';
 
 export const getAllRecruiters = query({
     args: {},
@@ -34,11 +35,34 @@ export const getRecruiterById = query({
     args: { userId: v.id('users') },
     handler: async (ctx, args) => {
         const user = await ctx.db.get(args.userId);
+
+        if (user === null) return;
+
         const recruiter = await getOneFrom(
             ctx.db,
             'recruiters',
             'byUserId',
-            args.userId,
+            user?._id,
+            'userId'
+        );
+        return { ...user, ...recruiter };
+    },
+});
+
+export const getRecruiter = query({
+    args: {},
+    handler: async (ctx) => {
+        const userId = await auth.getUserId(ctx);
+
+        if (userId === null) return;
+
+        const user = await ctx.db.get(userId);
+
+        const recruiter = await getOneFrom(
+            ctx.db,
+            'recruiters',
+            'byUserId',
+            userId,
             'userId'
         );
         return { ...user, ...recruiter };
@@ -67,15 +91,15 @@ export const createRecruiter = mutation({
         description: v.string(),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'user') {
+        if (user?.role !== undefined) {
             return {
                 success: false,
                 message: 'You must be a user',
@@ -83,7 +107,7 @@ export const createRecruiter = mutation({
         }
 
         const recruiterId = await ctx.db.insert('recruiters', {
-            userId: user._id,
+            userId: userId,
             phone: args.phone,
             country: args.country,
             city: args.city,
@@ -95,7 +119,19 @@ export const createRecruiter = mutation({
             return { success: false, message: 'Error try again' };
         }
 
-        await ctx.db.patch(user._id, { role: 'recruiter' });
+        if (recruiterId !== null) {
+            const testNewUser = await ctx.scheduler.runAfter(
+                0,
+                api.helpers.newUserEmail,
+                {
+                    email: user?.email!,
+                    name: user?.name!,
+                }
+            );
+            console.log('testNew', testNewUser);
+        }
+
+        await ctx.db.patch(userId, { role: 'recruiter' });
 
         return {
             success: true,
@@ -113,13 +149,13 @@ export const updateRecruiter = mutation({
         description: v.string(),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'recruiter') {
             return { success: false, message: 'You must be a recruiter' };
@@ -143,13 +179,13 @@ export const updateRecruiter = mutation({
 export const deleteRecruiter = mutation({
     args: { recruiterId: v.id('users') },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'recruiter') {
             return {
@@ -170,14 +206,6 @@ export const deleteRecruiter = mutation({
                 message: `${user.name} you can't delete your account now because jobs are still on going.`,
             };
         }
-
-        const account = await getOneFrom(
-            ctx.db,
-            'accounts',
-            'userId',
-            user?._id,
-            'userId'
-        );
 
         const recruiter = await getOneFrom(
             ctx.db,
@@ -207,10 +235,61 @@ export const deleteRecruiter = mutation({
             .filter((q) => q.eq(q.field('category'), 'job'))
             .collect();
 
-        // emailer.notifyUserForDeletedAccount(user?.email, user?.name);
-        await ctx.db.delete(args.recruiterId);
+        const sessionToDelete = await getOneFrom(
+            ctx.db,
+            'authSessions',
+            'userId',
+            user?._id,
+            'userId'
+        );
+        const accountToDelete = await ctx.db
+            .query('authAccounts')
+            .filter((q) => q.eq(q.field('userId'), user._id))
+            .unique();
 
-        await ctx.db.delete(account?._id!);
+        const refreshToDelete = await getOneFrom(
+            ctx.db,
+            'authRefreshTokens',
+            'sessionId',
+            sessionToDelete?._id!,
+            'sessionId'
+        );
+        const verficationToDelete = await getOneFrom(
+            ctx.db,
+            'authVerificationCodes',
+            'accountId',
+            accountToDelete?._id!,
+            'accountId'
+        );
+        const verifierToDelete = await ctx.db
+            .query('authVerifiers')
+            .filter((q) => q.eq(q.field('sessionId'), sessionToDelete?._id))
+            .unique();
+        const rateLimitToDelete = await ctx.db
+            .query('authRateLimits')
+            .filter((q) => q.eq(q.field('identifier'), user._id))
+            .unique();
+
+        const authTableArray = [
+            user,
+            sessionToDelete,
+            accountToDelete,
+            refreshToDelete,
+            verficationToDelete,
+            verifierToDelete,
+            rateLimitToDelete,
+        ];
+
+        await ctx.scheduler.runAfter(0, api.helpers.deleteUserEmail, {
+            email: user?.email!,
+            name: user?.name!,
+        });
+
+        await asyncMap(authTableArray, async (authTable) => {
+            if (authTable !== null) {
+                return await ctx.db.delete(authTable?._id!);
+            }
+        });
 
         await ctx.db.delete(recruiter?._id!);
 

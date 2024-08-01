@@ -1,20 +1,6 @@
-import { Auth } from 'convex/server';
-import { Id } from './_generated/dataModel';
+import { convexAuth } from '@convex-dev/auth/server';
+import Google from '@auth/core/providers/google';
 
-export async function getSessionId(ctx: { auth: Auth }) {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-        return null;
-    }
-    const [, sessionId] = identity.subject.split(';');
-    return sessionId as Id<'sessions'>;
-}
-
-export async function getUserId(ctx: { auth: Auth }) {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-        return null;
-    }
-    const [userId] = identity.subject.split(';');
-    return userId as Id<'users'>;
-}
+export const { auth, signIn, signOut, store } = convexAuth({
+    providers: [Google],
+});

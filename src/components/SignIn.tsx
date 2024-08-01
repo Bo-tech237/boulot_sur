@@ -1,4 +1,3 @@
-import { signIn } from '@/auth';
 import React from 'react';
 import { Button } from './ui/button';
 import GoogleSignInError from '@/app/login/GoogleSignInError';
@@ -13,6 +12,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MagicLinkAuth from './MagicLinkAuth';
 import { Separator } from './ui/separator';
+import { SignInWithGoogle } from '@/auth/SignInWithGoogle';
+import { SignInMethodDivider } from '@/auth/SignInMethodDivider';
 
 export default async function SignIn() {
     return (
@@ -35,23 +36,8 @@ export default async function SignIn() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div>
-                        <form
-                            action={async () => {
-                                'use server';
-                                await signIn('google');
-                            }}
-                        >
-                            <Button type="submit" className="w-full">
-                                Sign In With Google
-                            </Button>
-                        </form>
-                    </div>
-                    <div className="flex items-center justify-center gap-1 my-5">
-                        <Separator className="w-[115px]" />
-                        <span className="uppercase text-white">or</span>
-                        <Separator className="w-[115px]" />
-                    </div>
+                    <SignInWithGoogle />
+                    <SignInMethodDivider />
                     <MagicLinkAuth />
                     <div className="pt-3">
                         <GoogleSignInError />

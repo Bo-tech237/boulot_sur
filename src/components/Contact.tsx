@@ -12,13 +12,11 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { toast } from './ui/use-toast';
 import { contactSchema, contactTypes } from '@/lib/contactSchema';
 import { contactAdmin } from '@/actions/contactAdmin';
-
-type accountTypeProps = { accountType: string };
+import { Textarea } from './ui/textarea';
 
 function Contact() {
     const form = useForm<contactTypes>({
@@ -32,13 +30,18 @@ function Contact() {
             return form.setError('root', { message: result.message });
         }
 
-        toast({
-            variant: 'success',
-            title: 'You have log in successfully',
-            description: `${new Date().toUTCString()}`,
+        form.reset({
+            name: '',
+            email: '',
+            phone: '',
+            message: '',
         });
 
-        form.reset();
+        toast({
+            variant: 'success',
+            title: result?.message,
+            description: `${new Date().toUTCString()}`,
+        });
     }
 
     return (
@@ -98,6 +101,25 @@ function Contact() {
                             </FormItem>
                         )}
                     />
+
+                    <FormField
+                        control={form.control}
+                        name="message"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Leave a message</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Enter message"
+                                        className="resize-none"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                     <div className="mt-4">
                         <Button
                             type="submit"

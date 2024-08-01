@@ -1,6 +1,7 @@
 import { query, mutation } from './_generated/server';
 import { ConvexError, v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
+import { auth } from './auth';
 
 export const getBestReviews = query({
     args: {},
@@ -110,10 +111,10 @@ export const getCommentByUserId = query({
 export const createComment = mutation({
     args: { userId: v.id('users'), jobId: v.id('jobs'), text: v.string() },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new ConvexError('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
         const newComment = await ctx.db.insert('comments', {
@@ -139,10 +140,10 @@ export const createComment = mutation({
 export const updateComment = mutation({
     args: { commentId: v.id('comments'), text: v.string() },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new ConvexError('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
         await ctx.db.patch(args.commentId, {

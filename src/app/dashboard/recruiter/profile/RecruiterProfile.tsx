@@ -1,23 +1,15 @@
 'use client';
 
 import { api } from '../../../../../convex/_generated/api';
-import { Id } from '../../../../../convex/_generated/dataModel';
 import LeftContent from '@/components/recruiter-details/LeftContent';
 import RightContent from '@/components/recruiter-details/RightContent';
 import DeleteRecruitersDialog from '@/components/DeleteRecruitersDialog ';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Session } from 'next-auth';
 import { useStableQuery } from '@/hooks/useStableQuery';
 
-type Props = {
-    session: Session;
-};
-
-function RecruiterProfile({ session }: Props) {
-    const recruiter = useStableQuery(api.recruiters.getRecruiterById, {
-        userId: session?.user.id as Id<'users'>,
-    });
+function RecruiterProfile() {
+    const recruiter = useStableQuery(api.recruiters.getRecruiter);
 
     if (recruiter === undefined) {
         return (
@@ -26,6 +18,8 @@ function RecruiterProfile({ session }: Props) {
             </div>
         );
     }
+
+    if (recruiter === null) return;
 
     return (
         <div className="w-full py-10">

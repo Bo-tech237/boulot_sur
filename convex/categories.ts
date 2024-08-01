@@ -2,13 +2,9 @@ import { Id } from './_generated/dataModel';
 import { query, mutation } from './_generated/server';
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
-import {
-    getAll,
-    getOneFrom,
-    getManyFrom,
-    getManyVia,
-} from 'convex-helpers/server/relationships';
+import { getManyFrom } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
+import { authTables } from '@convex-dev/auth/server';
 
 export const getAllCategories = query({
     args: {},

@@ -39,7 +39,7 @@ export default function AllRecruiters() {
                                 className="transition-all duration-500 ease-in-out hover:-translate-y-2"
                             >
                                 <Link
-                                    href={`/recruiters/${recruiterWithUser.recruiter.userId}`}
+                                    href={`/recruiter/${recruiterWithUser.recruiter.userId}`}
                                 >
                                     <Card className="">
                                         <CardHeader>
@@ -65,6 +65,11 @@ export default function AllRecruiters() {
                                 </Link>
                             </div>
                         ))}
+                    {recruitersWithUsers.length === 0 && (
+                        <div className="text-red-900 text-center text-2xl">
+                            No recruiter availble
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

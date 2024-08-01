@@ -1,29 +1,25 @@
 import { Id } from './_generated/dataModel';
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import {
-    getAll,
-    getOneFrom,
-    getManyFrom,
-    getManyVia,
-} from 'convex-helpers/server/relationships';
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
+import { auth } from './auth';
 
 export const getAllApplictions = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (!identity) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
         const applications = await ctx.db
             .query('applications')
             .filter((q) =>
                 q.or(
-                    q.eq(q.field('applicantId'), identity.subject),
-                    q.eq(q.field('recruiterId'), identity.subject)
+                    q.eq(q.field('applicantId'), userId),
+                    q.eq(q.field('recruiterId'), userId)
                 )
             )
             .order('desc')
@@ -64,16 +60,16 @@ export const getAllApplictions = query({
 export const createApplication = mutation({
     args: { sop: v.string(), jobId: v.id('jobs') },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
+        if (userId === null) {
             return {
                 success: false,
                 message: 'You have to sign in before applying for this job',
             };
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'applicant') {
             return { success: false, message: 'You must be an applicant' };
@@ -215,13 +211,13 @@ export const updateApplication = mutation({
     },
 
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role === 'recruiter') {
             const application = await ctx.db.get(args.applicationId);
@@ -485,13 +481,13 @@ export const updateApplication = mutation({
 export const deleteApplication = mutation({
     args: { applicationId: v.id('applications') },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'applicant') {
             return {

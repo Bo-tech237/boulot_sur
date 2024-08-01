@@ -1,13 +1,9 @@
-import { Id } from './_generated/dataModel';
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import {
-    getAll,
-    getOneFrom,
-    getManyFrom,
-    getManyVia,
-} from 'convex-helpers/server/relationships';
+import { getOneFrom, getManyFrom } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
+import { auth } from './auth';
+import { api, internal } from './_generated/api';
 
 export const getAllApplicants = query({
     args: {},
@@ -21,15 +17,20 @@ export const getAllApplicants = query({
     },
 });
 
-export const getApplicantById = query({
-    args: { userId: v.id('users') },
-    handler: async (ctx, args) => {
-        const user = await ctx.db.get(args.userId);
+export const getApplicant = query({
+    args: {},
+    handler: async (ctx) => {
+        const userId = await auth.getUserId(ctx);
+
+        if (userId === null) return;
+
+        const user = await ctx.db.get(userId);
+
         const applicant = await getOneFrom(
             ctx.db,
             'applicants',
             'byUserId',
-            args.userId,
+            userId,
             'userId'
         );
 
@@ -81,15 +82,15 @@ export const createApplicant = mutation({
         fileId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'user') {
+        if (user?.role !== undefined) {
             return {
                 success: false,
                 message: 'You must be a user',
@@ -97,7 +98,7 @@ export const createApplicant = mutation({
         }
 
         const applicantId = await ctx.db.insert('applicants', {
-            userId: user._id,
+            userId: userId,
             education: args.education,
             skills: args.skills,
             fileId: args.fileId,
@@ -108,7 +109,12 @@ export const createApplicant = mutation({
             return { success: false, message: 'Error try again' };
         }
 
-        await ctx.db.patch(user._id, { role: 'applicant' });
+        await ctx.scheduler.runAfter(0, internal.email.newUserEmail, {
+            email: user?.email!,
+            name: user?.name!,
+        });
+
+        await ctx.db.patch(userId, { role: 'applicant' });
 
         return {
             success: true,
@@ -122,17 +128,15 @@ export const updateCV = mutation({
         fileId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
         const applicant = await ctx.db
             .query('applicants')
-            .withIndex('byUserId', (q) =>
-                q.eq('userId', identity.subject as Id<'users'>)
-            )
+            .withIndex('byUserId', (q) => q.eq('userId', userId))
             .unique();
 
         if (!applicant?.fileId) return;
@@ -157,17 +161,15 @@ export const addFileId = mutation({
         fileId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
         const applicant = await ctx.db
             .query('applicants')
-            .withIndex('byUserId', (q) =>
-                q.eq('userId', identity.subject as Id<'users'>)
-            )
+            .withIndex('byUserId', (q) => q.eq('userId', userId))
             .unique();
 
         if (!applicant) {
@@ -201,13 +203,13 @@ export const updateApplicant = mutation({
         ),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'applicant') {
             return { success: false, message: 'You must be an applicant' };
@@ -229,13 +231,13 @@ export const updateApplicant = mutation({
 export const deleteApplicant = mutation({
     args: { applicantId: v.id('users') },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'applicant') {
             return {
@@ -248,14 +250,6 @@ export const deleteApplicant = mutation({
             ctx.db,
             'applicants',
             'byUserId',
-            user?._id,
-            'userId'
-        );
-
-        const account = await getOneFrom(
-            ctx.db,
-            'accounts',
-            'userId',
             user?._id,
             'userId'
         );
@@ -290,15 +284,65 @@ export const deleteApplicant = mutation({
             .filter((q) => q.eq(q.field('category'), 'applicant'))
             .collect();
 
-        await ctx.db.delete(args.applicantId);
+        const sessionToDelete = await getOneFrom(
+            ctx.db,
+            'authSessions',
+            'userId',
+            user?._id,
+            'userId'
+        );
+        const accountToDelete = await ctx.db
+            .query('authAccounts')
+            .filter((q) => q.eq(q.field('userId'), user._id))
+            .unique();
+
+        const refreshToDelete = await getOneFrom(
+            ctx.db,
+            'authRefreshTokens',
+            'sessionId',
+            sessionToDelete?._id!,
+            'sessionId'
+        );
+        const verficationToDelete = await getOneFrom(
+            ctx.db,
+            'authVerificationCodes',
+            'accountId',
+            accountToDelete?._id!,
+            'accountId'
+        );
+        const verifierToDelete = await ctx.db
+            .query('authVerifiers')
+            .filter((q) => q.eq(q.field('sessionId'), sessionToDelete?._id))
+            .unique();
+        const rateLimitToDelete = await ctx.db
+            .query('authRateLimits')
+            .filter((q) => q.eq(q.field('identifier'), user._id))
+            .unique();
+
+        const authTableArray = [
+            user,
+            sessionToDelete,
+            accountToDelete,
+            refreshToDelete,
+            verficationToDelete,
+            verifierToDelete,
+            rateLimitToDelete,
+        ];
+
+        await ctx.scheduler.runAfter(0, internal.email.deleteUserEmail, {
+            email: user?.email!,
+            name: user?.name!,
+        });
+
+        await asyncMap(authTableArray, async (authTable) => {
+            if (authTable !== null) {
+                return await ctx.db.delete(authTable?._id!);
+            }
+        });
 
         await ctx.db.delete(applicant?._id!);
 
-        await ctx.db.delete(account?._id!);
-
         await ctx.storage.delete(applicant?.fileId!);
-
-        // emailer.notifyUserForDeletedAccount(user?.email, user?.name);
 
         // delete all applicant applications
         await asyncMap(myApplications, async (myApplication) => {

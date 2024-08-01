@@ -8,6 +8,10 @@ export type ApplicantDataType = {
     fileId?: Id<'_storage'>;
     image?: string;
     name?: string;
+    phone?: string | number;
+    emailVerificationTime?: number;
+    phoneVerificationTime?: number;
+    isAnonymous?: boolean;
     rating?: number;
     role?: string;
     skills?: Skill[];

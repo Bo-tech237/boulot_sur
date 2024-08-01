@@ -7,8 +7,7 @@ import Footer from '@/components/Footer';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import ConvexClientProvider from '../../providers/ConvexClientProvider';
 import { Toaster } from '@/components/ui/toaster';
-import { ConvexQueryCacheProvider } from 'convex-helpers/react/cache/provider';
-import getSession from '@/lib/getSession';
+import MyMiddleware from '@/components/MyMiddleware';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,6 +28,7 @@ export default async function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
                 <ConvexClientProvider>
+                    <MyMiddleware />
                     <ThemeProvider
                         attribute="class"
                         defaultTheme="system"
@@ -36,9 +36,9 @@ export default async function RootLayout({
                         disableTransitionOnChange
                     >
                         <MainNav />
-                        <ConvexQueryCacheProvider>
-                            {children}
-                        </ConvexQueryCacheProvider>
+
+                        {children}
+
                         <Footer />
                         <Toaster />
                         <ScrollToTop />

@@ -5,8 +5,6 @@ type Props = { params: { id: string } };
 
 export const metadata: Metadata = {
     title: 'Update Profile',
-
-    description: 'Find your dream job in Cameroon!',
 };
 
 function UpdateProfilepage({ params }: Props) {

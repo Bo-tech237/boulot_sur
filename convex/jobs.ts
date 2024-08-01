@@ -2,13 +2,9 @@ import { Id } from './_generated/dataModel';
 import { query, mutation } from './_generated/server';
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
-import {
-    getAll,
-    getOneFrom,
-    getManyFrom,
-    getManyVia,
-} from 'convex-helpers/server/relationships';
+import { getManyFrom } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
+import { auth } from './auth';
 
 export const getAllJobs = query({
     args: { paginationOpts: paginationOptsValidator },
@@ -102,13 +98,13 @@ export const getJobsByCategory = query({
 export const getAllRecruiterJobsWithoutId = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('You are not logged in');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'recruiter') {
             return;
@@ -143,13 +139,13 @@ export const createJob = mutation({
         companyLogo: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'recruiter') {
             return {
@@ -208,13 +204,13 @@ export const updateJob = mutation({
         companyLogo: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
         const job = await ctx.db.get(args.jobId);
 
         if (user?.role !== 'recruiter') {
@@ -254,13 +250,13 @@ export const updateJob = mutation({
 export const deleteJob = mutation({
     args: { jobId: v.id('jobs') },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role !== 'recruiter') {
             return {

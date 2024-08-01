@@ -8,6 +8,7 @@ import {
     getManyVia,
 } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
+import { auth } from './auth';
 
 export const getAllRatings = query({
     args: {},
@@ -63,13 +64,13 @@ export const updateRatings = mutation({
         jobId: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+        const userId = await auth.getUserId(ctx);
 
-        if (identity === null) {
-            throw new Error('Unauthenticated call to mutation');
+        if (userId === null) {
+            throw new Error('You need to be logged in');
         }
 
-        const user = await ctx.db.get(identity?.subject as Id<'users'>);
+        const user = await ctx.db.get(userId);
 
         if (user?.role === 'recruiter') {
             const rating = await ctx.db

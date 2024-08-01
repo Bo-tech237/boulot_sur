@@ -1,13 +1,11 @@
-'use server';
-
-import { contactTypes } from '@/lib/contactSchema';
+import { NextResponse, type NextRequest } from 'next/server';
 import { emailer } from '@/email/sendEmail';
 
-export async function contactAdmin(data: contactTypes) {
-    const { name, email, phone, message } = data;
+export async function POST(request: NextRequest) {
+    const { email, name } = await request.json();
 
     try {
-        const result = await emailer.contactAdmin(name, email, phone, message);
+        const result = await emailer.notifyUserForSignup(email, name);
 
         console.log('nodemailer response', result);
 
@@ -17,12 +15,11 @@ export async function contactAdmin(data: contactTypes) {
                 message: 'Message not sent retry later.',
             };
         }
-
-        return {
+        return NextResponse.json({
             success: true,
             message: 'Message sent successfully',
-        };
-    } catch (error) {
-        console.log(error);
+        });
+    } catch (err) {
+        return NextResponse.json({ message: 'Failed!', status: 500 });
     }
 }

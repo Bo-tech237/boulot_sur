@@ -30,7 +30,6 @@ function RegisterApplicant() {
     const generateUploadUrl = useMutation(api.uploads.generateUploadUrl);
     const { toast } = useToast();
     const router = useRouter();
-    const { update } = useSession();
 
     const form = useForm<applicantTypes>({
         resolver: zodResolver(applicantSchema),
@@ -89,7 +88,6 @@ function RegisterApplicant() {
             return form.setError('root', { message: newApplicant?.message });
         }
         if (newApplicant?.success === true) {
-            update();
             toast({
                 variant: 'success',
                 title: newApplicant.message,

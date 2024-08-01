@@ -10,7 +10,7 @@ export default function RecentSales() {
             <CardContent className="grid gap-8 overflow-auto">
                 <div className="flex items-center gap-4">
                     <Avatar className="hidden h-9 w-9 sm:flex">
-                        <AvatarImage src="/avatars/01.png" alt="Avatar" />
+                        <AvatarImage src="/user.svg" alt="Avatar" />
                         <AvatarFallback>OM</AvatarFallback>
                     </Avatar>
                     <div className="grid gap-1">
@@ -25,7 +25,7 @@ export default function RecentSales() {
                 </div>
                 <div className="flex items-center gap-4">
                     <Avatar className="hidden h-9 w-9 sm:flex">
-                        <AvatarImage src="/avatars/02.png" alt="Avatar" />
+                        <AvatarImage src="/user.svg" alt="Avatar" />
                         <AvatarFallback>JL</AvatarFallback>
                     </Avatar>
                     <div className="grid gap-1">
@@ -40,7 +40,7 @@ export default function RecentSales() {
                 </div>
                 <div className="flex items-center gap-4">
                     <Avatar className="hidden h-9 w-9 sm:flex">
-                        <AvatarImage src="/avatars/03.png" alt="Avatar" />
+                        <AvatarImage src="/user.svg" alt="Avatar" />
                         <AvatarFallback>IN</AvatarFallback>
                     </Avatar>
                     <div className="grid gap-1">
@@ -55,7 +55,7 @@ export default function RecentSales() {
                 </div>
                 <div className="flex items-center gap-4">
                     <Avatar className="hidden h-9 w-9 sm:flex">
-                        <AvatarImage src="/avatars/04.png" alt="Avatar" />
+                        <AvatarImage src="/user.svg" alt="Avatar" />
                         <AvatarFallback>WK</AvatarFallback>
                     </Avatar>
                     <div className="grid gap-1">
@@ -70,7 +70,7 @@ export default function RecentSales() {
                 </div>
                 <div className="flex items-center gap-4">
                     <Avatar className="hidden h-9 w-9 sm:flex">
-                        <AvatarImage src="/avatars/05.png" alt="Avatar" />
+                        <AvatarImage src="/user.svg" alt="Avatar" />
                         <AvatarFallback>SD</AvatarFallback>
                     </Avatar>
                     <div className="grid gap-1">

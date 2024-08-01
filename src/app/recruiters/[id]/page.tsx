@@ -27,7 +27,7 @@ export default function RecruiterJobs({ params }: Prop) {
 
     return (
         <div>
-            <section className="pt-40 pb-28 mb-20 bg-violet-700 text-white bg-center bg-cover relative">
+            <section className="pt-28 pb-28 bg-red-900 text-white bg-center bg-cover relative">
                 <Hero />
             </section>
             <div className="container mx-auto grid gap-2 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
@@ -38,7 +38,7 @@ export default function RecruiterJobs({ params }: Prop) {
                         </div>
                     ))}
             </div>
-            <div className="text-center">
+            <div className="text-center text-2xl text-red-900 my-10">
                 {jobs?.length === 0 && 'No job found'}
             </div>
         </div>

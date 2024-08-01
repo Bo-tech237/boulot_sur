@@ -34,7 +34,6 @@ function RegisterRecruiter({ recruiter }: Props) {
     const updateRecruiter = useMutation(api.recruiters.updateRecruiter);
     const { toast } = useToast();
     const router = useRouter();
-    const { update } = useSession();
 
     const form = useForm<recruiterTypes>({
         resolver: zodResolver(recruiterSchema),
@@ -97,7 +96,6 @@ function RegisterRecruiter({ recruiter }: Props) {
             }
 
             if (result?.success === true) {
-                update();
                 toast({
                     variant: 'success',
                     title: result?.message,
