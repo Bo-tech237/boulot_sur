@@ -109,7 +109,7 @@ export const createApplicant = mutation({
             return { success: false, message: 'Error try again' };
         }
 
-        await ctx.scheduler.runAfter(0, internal.email.newUserEmail, {
+        await ctx.scheduler.runAfter(0, api.email.newUserEmail, {
             email: user?.email!,
             name: user?.name!,
         });
@@ -329,7 +329,7 @@ export const deleteApplicant = mutation({
             rateLimitToDelete,
         ];
 
-        await ctx.scheduler.runAfter(0, internal.email.deleteUserEmail, {
+        await ctx.scheduler.runAfter(0, api.email.deleteUserEmail, {
             email: user?.email!,
             name: user?.name!,
         });

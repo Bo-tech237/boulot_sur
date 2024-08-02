@@ -20,7 +20,6 @@ import type * as auth from "../auth.js";
 import type * as categories from "../categories.js";
 import type * as comments from "../comments.js";
 import type * as email from "../email.js";
-import type * as helpers from "../helpers.js";
 import type * as http from "../http.js";
 import type * as jobs from "../jobs.js";
 import type * as ratings from "../ratings.js";
@@ -43,7 +42,6 @@ declare const fullApi: ApiFromModules<{
   categories: typeof categories;
   comments: typeof comments;
   email: typeof email;
-  helpers: typeof helpers;
   http: typeof http;
   jobs: typeof jobs;
   ratings: typeof ratings;

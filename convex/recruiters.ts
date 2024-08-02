@@ -119,17 +119,10 @@ export const createRecruiter = mutation({
             return { success: false, message: 'Error try again' };
         }
 
-        if (recruiterId !== null) {
-            const testNewUser = await ctx.scheduler.runAfter(
-                0,
-                api.helpers.newUserEmail,
-                {
-                    email: user?.email!,
-                    name: user?.name!,
-                }
-            );
-            console.log('testNew', testNewUser);
-        }
+        await ctx.scheduler.runAfter(0, api.email.newUserEmail, {
+            email: user?.email!,
+            name: user?.name!,
+        });
 
         await ctx.db.patch(userId, { role: 'recruiter' });
 
@@ -280,7 +273,7 @@ export const deleteRecruiter = mutation({
             rateLimitToDelete,
         ];
 
-        await ctx.scheduler.runAfter(0, api.helpers.deleteUserEmail, {
+        await ctx.scheduler.runAfter(0, api.email.deleteUserEmail, {
             email: user?.email!,
             name: user?.name!,
         });
