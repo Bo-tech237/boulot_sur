@@ -6,11 +6,15 @@ import { Button } from './ui/button';
 import { FileStack } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useStableQuery } from '@/hooks/useStableQuery';
+import { useQuery } from 'convex/react';
 
 export default function CategoryList() {
     const categoriesResults = useStableQuery(
         api.categories.getCategoriesWithTotalJobs
     );
+
+    const user = useQuery(api.users.getUser);
+    console.log('testUser1', user);
 
     if (categoriesResults === undefined) {
         return (

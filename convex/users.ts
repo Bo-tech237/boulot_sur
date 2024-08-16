@@ -14,11 +14,11 @@ export const getUser = query({
     args: {},
     handler: async (ctx) => {
         const userId = await auth.getUserId(ctx);
-
-        if (userId === null) return;
-
+        if (userId === null) {
+            return null;
+        }
         const user = await ctx.db.get(userId);
-
+        console.log('user:', user);
         return user;
     },
 });

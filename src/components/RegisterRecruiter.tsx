@@ -25,7 +25,6 @@ import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
 import { RecruiterDataType } from '@/types/recruiters';
 import { Progress } from '@/components/ui/progress';
-import { useSession } from 'next-auth/react';
 
 type Props = { recruiter?: RecruiterDataType | null };
 
@@ -62,7 +61,7 @@ function RegisterRecruiter({ recruiter }: Props) {
         if (recruiter) {
             const updatedRecruiter = await updateRecruiter({
                 recruiterId: recruiter?._id as Id<'recruiters'>,
-                phone: data.phone,
+                phone: data?.phone,
                 country: data.country,
                 city: data.city,
                 description: data.description,

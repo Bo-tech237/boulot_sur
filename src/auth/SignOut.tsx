@@ -2,9 +2,11 @@
 
 import { useAuthActions } from '@convex-dev/auth/react';
 import { LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function SignOut() {
     const { signOut } = useAuthActions();
+    const router = useRouter();
     return (
         <button
             className="flex w-full items-center"

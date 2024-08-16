@@ -23,7 +23,7 @@ export default function UserButton() {
     if (user === undefined) {
         return <div>Profile...</div>;
     }
-
+    console.log('testUser', user);
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -45,7 +45,7 @@ export default function UserButton() {
                         Role: {user?.role || 'User'}
                     </DropdownMenuItem>
 
-                    {user?.role === undefined ? (
+                    {user?.role === 'user' ? (
                         <DropdownMenuItem asChild>
                             <Link href="/register">
                                 <Lock className="mr-2 h-4 w-4" />

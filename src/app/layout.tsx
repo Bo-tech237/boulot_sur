@@ -5,9 +5,9 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import MainNav from '@/components/MainNav';
 import Footer from '@/components/Footer';
 import { ScrollToTop } from '@/components/ScrollToTop';
+import { ConvexAuthNextjsServerProvider } from '@convex-dev/auth/nextjs/server';
 import ConvexClientProvider from '../../providers/ConvexClientProvider';
 import { Toaster } from '@/components/ui/toaster';
-import MyMiddleware from '@/components/MyMiddleware';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,26 +25,27 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <body className={inter.className}>
-                <ConvexClientProvider>
-                    <MyMiddleware />
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
-                        <MainNav />
+        <ConvexAuthNextjsServerProvider>
+            <html lang="en" suppressHydrationWarning>
+                <body className={inter.className}>
+                    <ConvexClientProvider>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                            disableTransitionOnChange
+                        >
+                            <MainNav />
 
-                        {children}
+                            {children}
 
-                        <Footer />
-                        <Toaster />
-                        <ScrollToTop />
-                    </ThemeProvider>
-                </ConvexClientProvider>
-            </body>
-        </html>
+                            <Footer />
+                            <Toaster />
+                            <ScrollToTop />
+                        </ThemeProvider>
+                    </ConvexClientProvider>
+                </body>
+            </html>
+        </ConvexAuthNextjsServerProvider>
     );
 }

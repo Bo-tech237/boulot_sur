@@ -5,7 +5,7 @@ import HowItWorks from '@/components/home-page/HowItWorks';
 import Testimonials from '@/components/home-page/Testimonials';
 import WhyChooseUs from '@/components/home-page/WhyChooseUs';
 
-export default function Home() {
+export default async function Home() {
     return (
         <main className="">
             {/* <Hero /> */}

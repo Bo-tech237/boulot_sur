@@ -23,7 +23,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Progress } from '@/components/ui/progress';
-import { useSession } from 'next-auth/react';
 
 function RegisterApplicant() {
     const createApplicant = useMutation(api.applicants.createApplicant);

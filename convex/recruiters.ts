@@ -99,7 +99,7 @@ export const createRecruiter = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== undefined) {
+        if (user?.role !== 'user') {
             return {
                 success: false,
                 message: 'You must be a user',
@@ -273,11 +273,6 @@ export const deleteRecruiter = mutation({
             rateLimitToDelete,
         ];
 
-        await ctx.scheduler.runAfter(0, api.email.deleteUserEmail, {
-            email: user?.email!,
-            name: user?.name!,
-        });
-
         await asyncMap(authTableArray, async (authTable) => {
             if (authTable !== null) {
                 return await ctx.db.delete(authTable?._id!);
@@ -296,6 +291,11 @@ export const deleteRecruiter = mutation({
 
         await asyncMap(myRatings, async (myRating) => {
             return await ctx.db.delete(myRating._id);
+        });
+
+        await ctx.scheduler.runAfter(0, api.email.deleteUserEmail, {
+            email: user?.email!,
+            name: user?.name!,
         });
 
         return {

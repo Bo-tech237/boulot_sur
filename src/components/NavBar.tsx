@@ -61,7 +61,7 @@ function NavBar() {
                 </nav>
             </section>
 
-            <section className="flex items-center gap-2">
+            <section className="flex items-center justify-center gap-2">
                 <div className="sm:flex sm:gap-4 text-white">
                     {authLinks.map((authLink) =>
                         authLink.href === '/login' ? (

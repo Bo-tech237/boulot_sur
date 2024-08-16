@@ -90,7 +90,7 @@ export const createApplicant = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== undefined) {
+        if (user?.role !== 'user') {
             return {
                 success: false,
                 message: 'You must be a user',

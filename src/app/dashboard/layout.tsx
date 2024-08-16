@@ -19,14 +19,12 @@ export default async function SettingsLayout({
 }: SettingsLayoutProps) {
     return (
         <>
-            <DashboardPermissions>
-                <div className="flex min-h-screen w-full flex-col">
-                    <DashboardNav />
-                    <main className="container flex flex-1 flex-col gap-4 py-4 md:gap-8">
-                        {children}
-                    </main>
-                </div>
-            </DashboardPermissions>
+            <div className="flex min-h-screen w-full flex-col">
+                <DashboardNav />
+                <main className="container flex flex-1 flex-col gap-4 py-4 md:gap-8">
+                    {children}
+                </main>
+            </div>
         </>
     );
 }
