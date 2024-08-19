@@ -5,9 +5,14 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import { ArrowRight, FileStack } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 import { useStableQuery } from '@/hooks/useStableQuery';
 
 export default function CategoryListHome() {
+    const { data, isPending, error } = useQuery(
+        convexQuery(api.categories.getHomeCategories, {})
+    );
     const categoriesResults = useStableQuery(api.categories.getHomeCategories);
 
     if (categoriesResults === undefined) {
@@ -17,7 +22,7 @@ export default function CategoryListHome() {
             </div>
         );
     }
-
+    console.log('test', data);
     return (
         <div>
             <div className="mx-auto max-w-screen-xl px-8 py-8 sm:px-6 sm:py-12 lg:py-16">

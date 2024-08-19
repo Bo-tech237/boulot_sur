@@ -20,6 +20,8 @@ export default convexAuthNextjsMiddleware(async (request) => {
         { token: convexAuthNextjsToken() }
     );
 
+    console.log('test01', user);
+
     if (isLoginInPage(request) && isAuthenticatedNextjs()) {
         return nextjsMiddlewareRedirect(request, '/register');
     }

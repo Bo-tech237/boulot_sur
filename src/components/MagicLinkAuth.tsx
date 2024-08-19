@@ -1,4 +1,5 @@
 'use client';
+
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -16,8 +17,11 @@ import { Loader2 } from 'lucide-react';
 import { toast } from './ui/use-toast';
 import { magicLinkAuth } from '@/actions/magicLinkAuth';
 import { magicLinkSchema, magicLinkTypes } from '@/lib/magicLinkSchema';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 function MagicLinkAuth() {
+    const { signIn } = useAuthActions();
+
     const form = useForm<magicLinkTypes>({
         resolver: zodResolver(magicLinkSchema),
     });
@@ -28,6 +32,8 @@ function MagicLinkAuth() {
         if (result?.success === false) {
             return form.setError('root', { message: result.message });
         }
+
+        void signIn('email', data);
 
         toast({
             variant: 'success',
