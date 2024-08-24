@@ -37,11 +37,8 @@ export default async function RootLayout({
                                 enableSystem
                                 disableTransitionOnChange
                             >
-                                <MainNav />
-
                                 {children}
 
-                                <Footer />
                                 <Toaster />
                                 <ScrollToTop />
                             </ThemeProvider>

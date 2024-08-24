@@ -9,7 +9,7 @@ export type RecruiterDataType = {
     email?: string;
     image?: string;
     name?: string;
-    phone?: number;
+    phone?: number | string;
     emailVerificationTime?: number;
     phoneVerificationTime?: number;
     isAnonymous?: boolean;

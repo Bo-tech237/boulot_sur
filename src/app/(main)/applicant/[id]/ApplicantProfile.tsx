@@ -1,18 +1,16 @@
 'use client';
 
 import React from 'react';
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
+import { api } from '../../../../../convex/_generated/api';
+import { Id } from '../../../../../convex/_generated/dataModel';
 import Hero from './Hero';
-import LeftContent from '../../../components/applicant-details/LeftContent';
-import RightContent from '../../../components/applicant-details/RightContent';
+import LeftContent from '@/components/applicant-details/LeftContent';
+import RightContent from '@/components/applicant-details/RightContent';
 import { useStableQuery } from '@/hooks/useStableQuery';
 import UserTestimonials from '@/components/UserTestimonials';
 
 export default function ApplicantProfile({ id }: { id: string }) {
-    const applicant = useStableQuery(api.applicants.getApplicantById, {
-        userId: id as Id<'users'>,
-    });
+    const applicant = useStableQuery(api.applicants.getApplicant);
 
     const applicantReviews = useStableQuery(api.comments.getApplicantReviews, {
         userId: id as Id<'users'>,
@@ -45,8 +43,8 @@ export default function ApplicantProfile({ id }: { id: string }) {
                 <section className="py-20">
                     <div className="container mx-auto">
                         <div className="grid grid-cols-12 gap-y-10 lg:gap-10">
-                            <LeftContent applicant={applicant} />
-                            <RightContent applicant={applicant} />
+                            <LeftContent applicant={applicant!} />
+                            <RightContent applicant={applicant!} />
                         </div>
                         <UserTestimonials reviews={applicantReviews} />
                     </div>

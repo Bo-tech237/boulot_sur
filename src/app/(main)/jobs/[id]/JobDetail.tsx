@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import H1 from '@/components/ui/h1';
 import { formatMoney } from '@/lib/friendly-time';
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
+import { api } from '../../../../../convex/_generated/api';
+import { Id } from '../../../../../convex/_generated/dataModel';
 import { useStableQuery } from '@/hooks/useStableQuery';
 import { Loader2 } from 'lucide-react';
 

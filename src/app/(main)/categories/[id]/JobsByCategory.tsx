@@ -1,10 +1,10 @@
 'use client';
 
 import { useStableQuery } from '@/hooks/useStableQuery';
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
-import JobCard from '@/app/jobs/JobCard';
+import { api } from '../../../../../convex/_generated/api';
+import { Id } from '../../../../../convex/_generated/dataModel';
 import H1 from '@/components/ui/h1';
+import JobCard from '../../jobs/JobCard';
 
 export default function JobsByCategory({ id }: { id: string }) {
     const jobsWithCategory = useStableQuery(api.jobs.getJobsByCategory, {

@@ -12,7 +12,7 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { formatMoney, relativeDate } from '@/lib/friendly-time';
 import { ShowRating } from '@/components/ui/showRating';
-import { Doc } from '../../../convex/_generated/dataModel';
+import { Doc } from '../../../../convex/_generated/dataModel';
 
 type Props = { job: Doc<'jobs'> };
 

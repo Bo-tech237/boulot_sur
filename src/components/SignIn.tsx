@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from './ui/button';
-import GoogleSignInError from '@/app/login/GoogleSignInError';
+import GoogleSignInError from '@/app/(main)/login/GoogleSignInError';
 import {
     Card,
     CardContent,

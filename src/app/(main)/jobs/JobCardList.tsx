@@ -1,9 +1,9 @@
 'use client';
 
 import { useStableQuery } from '@/hooks/useStableQuery';
-import { api } from '../../../convex/_generated/api';
 import JobCard from './JobCard';
 import { Loader2 } from 'lucide-react';
+import { api } from '../../../../convex/_generated/api';
 
 export default function JobCardList({ search }: { search?: string }) {
     const jobs = useStableQuery(api.jobs.getJobBySearch, {

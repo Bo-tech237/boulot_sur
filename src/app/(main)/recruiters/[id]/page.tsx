@@ -2,10 +2,10 @@
 
 import { useStableQuery } from '@/hooks/useStableQuery';
 import React from 'react';
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
-import JobCard from '@/app/jobs/JobCard';
-import Hero from '@/app/recruiter/[id]/Hero';
+import { api } from '../../../../../convex/_generated/api';
+import { Id } from '../../../../../convex/_generated/dataModel';
+import Hero from '../../recruiter/[id]/Hero';
+import JobCard from '../../jobs/JobCard';
 
 type Prop = {
     params: { id: string };

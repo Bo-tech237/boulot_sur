@@ -3,8 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { useStableQuery } from '@/hooks/useStableQuery';
-import { api } from '../../../convex/_generated/api';
 import { FileStack } from 'lucide-react';
+import { api } from '../../../../convex/_generated/api';
 
 export default function AllRecruiters() {
     const recruitersWithUsers = useStableQuery(api.recruiters.getAllRecruiters);

@@ -6,15 +6,16 @@ import { Button } from './ui/button';
 import { FileStack } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useStableQuery } from '@/hooks/useStableQuery';
-import { useQuery } from 'convex/react';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
 export default function CategoryList() {
+    const { data, isPending, error } = useQuery(
+        convexQuery(api.categories.getCategoriesWithTotalJobs, {})
+    );
     const categoriesResults = useStableQuery(
         api.categories.getCategoriesWithTotalJobs
     );
-
-    const user = useQuery(api.users.getUser);
-    console.log('testUser1', user);
 
     if (categoriesResults === undefined) {
         return (
@@ -37,10 +38,14 @@ export default function CategoryList() {
                         quickly match you with the right freelancers.
                     </p>
                 </div>
-
+                {isPending && (
+                    <div className="flex py-5 items-center justify-center">
+                        Loading Categories...
+                    </div>
+                )}
                 <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {categoriesResults !== null &&
-                        categoriesResults.map((categoryResult) => (
+                    {data !== null &&
+                        data?.map((categoryResult) => (
                             <div
                                 key={categoryResult.category._id}
                                 className="transition-all duration-500 ease-in-out hover:-translate-y-2"

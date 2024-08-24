@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { recruiterNavItems, applicantNavItems } from '@/constants/data';
 import { useStableQuery } from '@/hooks/useStableQuery';
 import { api } from '../../convex/_generated/api';
-import { Authenticated, Unauthenticated } from 'convex/react';
+import UserButton from './UserButton';
 
 function DashboardNav() {
     const user = useStableQuery(api.users.getUser);
@@ -23,61 +23,63 @@ function DashboardNav() {
     const pathname = usePathname();
 
     if (user === undefined) {
-        return <div>Navigation...</div>;
+        return (
+            <div className="flex py-5 items-center justify-center">
+                Navigation...
+            </div>
+        );
     }
 
     if (user === null) return;
 
     return (
-        <header className="container mx-auto sticky top-16 flex h-16 items-center gap-4 border-b bg-background">
+        <header className="container mx-auto sticky top-0 z-50 flex h-20 items-center gap-4 border-b bg-background mb-10">
             <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-                <Authenticated>
-                    {user?.role === 'recruiter'
-                        ? recruiterNavItems.map((item, index) => {
-                              return (
-                                  <Link
-                                      key={index}
-                                      href={item.href}
-                                      className={cn(
-                                          buttonVariants({
-                                              variant:
-                                                  pathname === item.href
-                                                      ? 'default'
-                                                      : 'ghost',
-                                          }),
-                                          item.variant === 'default' && '',
-                                          'justify-start  lg:text-xl'
-                                      )}
-                                  >
-                                      <span className="flex items-center justify-center gap-3">
-                                          {item.title}
-                                      </span>
-                                  </Link>
-                              );
-                          })
-                        : applicantNavItems.map((item, index) => {
-                              return (
-                                  <Link
-                                      key={index}
-                                      href={item.href}
-                                      className={cn(
-                                          buttonVariants({
-                                              variant:
-                                                  pathname === item.href
-                                                      ? 'default'
-                                                      : 'ghost',
-                                          }),
-                                          item.variant === 'default' && '',
-                                          'justify-start  lg:text-xl'
-                                      )}
-                                  >
-                                      <span className="flex items-center justify-center gap-3">
-                                          {item.title}
-                                      </span>
-                                  </Link>
-                              );
-                          })}
-                </Authenticated>
+                {user?.role === 'recruiter'
+                    ? recruiterNavItems.map((item, index) => {
+                          return (
+                              <Link
+                                  key={index}
+                                  href={item.href}
+                                  className={cn(
+                                      buttonVariants({
+                                          variant:
+                                              pathname === item.href
+                                                  ? 'default'
+                                                  : 'ghost',
+                                      }),
+                                      item.variant === 'default' && '',
+                                      'justify-start  lg:text-xl'
+                                  )}
+                              >
+                                  <span className="flex items-center justify-center gap-3">
+                                      {item.title}
+                                  </span>
+                              </Link>
+                          );
+                      })
+                    : applicantNavItems.map((item, index) => {
+                          return (
+                              <Link
+                                  key={index}
+                                  href={item.href}
+                                  className={cn(
+                                      buttonVariants({
+                                          variant:
+                                              pathname === item.href
+                                                  ? 'default'
+                                                  : 'ghost',
+                                      }),
+                                      item.variant === 'default' && '',
+                                      'justify-start  lg:text-xl'
+                                  )}
+                              >
+                                  <span className="flex items-center justify-center gap-3">
+                                      {item.title}
+                                  </span>
+                              </Link>
+                          );
+                      })}
             </nav>
             <Sheet>
                 <SheetTrigger asChild>
@@ -99,59 +101,56 @@ function DashboardNav() {
                             <Package2 className="h-6 w-6" />
                             <span className="sr-only">Acme Inc</span>
                         </Link>
-                        <Authenticated>
-                            {user?.role === 'recruiter'
-                                ? recruiterNavItems.map((item) => {
-                                      return (
-                                          <SheetClose key={item.title} asChild>
-                                              <Link
-                                                  href={item.href}
-                                                  className={cn(
-                                                      buttonVariants({
-                                                          variant:
-                                                              pathname ===
-                                                              item.href
-                                                                  ? 'default'
-                                                                  : 'ghost',
-                                                      }),
-                                                      item.variant ===
-                                                          'default' && '',
-                                                      'justify-start  lg:text-xl'
-                                                  )}
-                                              >
-                                                  <span className="flex items-center justify-center gap-3">
-                                                      {item.title}
-                                                  </span>
-                                              </Link>
-                                          </SheetClose>
-                                      );
-                                  })
-                                : applicantNavItems.map((item) => {
-                                      return (
-                                          <SheetClose key={item.title} asChild>
-                                              <Link
-                                                  href={item.href}
-                                                  className={cn(
-                                                      buttonVariants({
-                                                          variant:
-                                                              pathname ===
-                                                              item.href
-                                                                  ? 'default'
-                                                                  : 'ghost',
-                                                      }),
-                                                      item.variant ===
-                                                          'default' && '',
-                                                      'justify-start  lg:text-xl'
-                                                  )}
-                                              >
-                                                  <span className="flex items-center justify-center gap-3">
-                                                      {item.title}
-                                                  </span>
-                                              </Link>
-                                          </SheetClose>
-                                      );
-                                  })}
-                        </Authenticated>
+
+                        {user?.role === 'recruiter'
+                            ? recruiterNavItems.map((item) => {
+                                  return (
+                                      <SheetClose key={item.title} asChild>
+                                          <Link
+                                              href={item.href}
+                                              className={cn(
+                                                  buttonVariants({
+                                                      variant:
+                                                          pathname === item.href
+                                                              ? 'default'
+                                                              : 'ghost',
+                                                  }),
+                                                  item.variant === 'default' &&
+                                                      '',
+                                                  'justify-start  lg:text-xl'
+                                              )}
+                                          >
+                                              <span className="flex items-center justify-center gap-3">
+                                                  {item.title}
+                                              </span>
+                                          </Link>
+                                      </SheetClose>
+                                  );
+                              })
+                            : applicantNavItems.map((item) => {
+                                  return (
+                                      <SheetClose key={item.title} asChild>
+                                          <Link
+                                              href={item.href}
+                                              className={cn(
+                                                  buttonVariants({
+                                                      variant:
+                                                          pathname === item.href
+                                                              ? 'default'
+                                                              : 'ghost',
+                                                  }),
+                                                  item.variant === 'default' &&
+                                                      '',
+                                                  'justify-start  lg:text-xl'
+                                              )}
+                                          >
+                                              <span className="flex items-center justify-center gap-3">
+                                                  {item.title}
+                                              </span>
+                                          </Link>
+                                      </SheetClose>
+                                  );
+                              })}
                     </nav>
                 </SheetContent>
             </Sheet>
@@ -166,6 +165,7 @@ function DashboardNav() {
                         />
                     </div>
                 </form>
+                <UserButton />
             </div>
         </header>
     );
