@@ -71,7 +71,7 @@ export interface Recruiter {
     email?: string;
     image?: string;
     name?: string;
-    phone?: number;
+    phone?: string | number;
     rating?: number;
     role?: string;
     userId?: Id<'users'>;

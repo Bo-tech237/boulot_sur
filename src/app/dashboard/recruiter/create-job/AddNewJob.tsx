@@ -25,9 +25,14 @@ import { api } from '../../../../../convex/_generated/api';
 import { useMutation } from 'convex/react';
 import { Progress } from '@/components/ui/progress';
 import { useStableQuery } from '@/hooks/useStableQuery';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
 function AddNewJob() {
-    const categories = useStableQuery(api.categories.getAllCategories);
+    // const categories = useStableQuery(api.categories.getAllCategories);
+    const { data, isPending, error } = useQuery(
+        convexQuery(api.categories.getAllCategories, {})
+    );
     const createJob = useMutation(api.jobs.createJob);
     const { toast } = useToast();
     const router = useRouter();
@@ -45,7 +50,11 @@ function AddNewJob() {
         next,
     } = useRecruiterAddStepForm([
         <RecruiterAddJobForm1 {...form} />,
-        <RecruiterAddJobForm2 form={form} categories={categories!} />,
+        <RecruiterAddJobForm2
+            form={form}
+            categories={data!}
+            isPending={isPending}
+        />,
         <RecruiterAddJobForm3 {...form} />,
     ]);
 

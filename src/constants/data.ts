@@ -59,12 +59,10 @@ export const navLinks = [
     { title: 'Jobs', href: '/jobs' },
     { title: 'Categories', href: '/categories' },
     { title: 'Recruiters', href: '/recruiters' },
-];
-
-export const authLinks = [
-    { title: 'Sign in', href: '/login' },
     { title: 'Contact', href: '/contact' },
 ];
+
+export const authLinks = [{ title: 'Sign in', href: '/login' }];
 
 export const footerInfos = [
     {

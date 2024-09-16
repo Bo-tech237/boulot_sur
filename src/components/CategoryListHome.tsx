@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { ArrowRight, FileStack } from 'lucide-react';
+import { ArrowRight, FileStack, Loader2 } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useQuery } from '@tanstack/react-query';
 import { convexQuery } from '@convex-dev/react-query';
@@ -38,7 +38,8 @@ export default function CategoryListHome() {
                 </div>
 
                 {isPending && (
-                    <div className="flex py-5 items-center justify-center">
+                    <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                        <Loader2 size={50} className="animate-spin" />
                         Loading Categories...
                     </div>
                 )}

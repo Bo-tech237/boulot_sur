@@ -11,27 +11,33 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import Autoplay from 'embla-carousel-autoplay';
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useStableQuery } from '@/hooks/useStableQuery';
 import { api } from '../../../convex/_generated/api';
 import { ShowRating } from '../ui/showRating';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
 export default function Testimonials() {
-    const bestReviews = useStableQuery(api.comments.getBestReviews);
+    const { data, isPending, error } = useQuery(
+        convexQuery(api.comments.getBestReviews, {})
+    );
+
+    // const bestReviews = useStableQuery(api.comments.getBestReviews);
 
     const plugin = React.useRef(
         Autoplay({ delay: 2000, stopOnInteraction: false })
     );
 
-    if (bestReviews === undefined) {
-        return (
-            <div className="flex py-10 items-center justify-center">
-                Loading Reviews...
-            </div>
-        );
-    }
+    // if (bestReviews === undefined) {
+    //     return (
+    //         <div className="flex py-10 items-center justify-center">
+    //             Loading Reviews...
+    //         </div>
+    //     );
+    // }
 
-    console.log('bestReviews:', bestReviews);
+    console.log('bestReviews:', data);
 
     return (
         <section className="container">
@@ -61,6 +67,12 @@ export default function Testimonials() {
                 </div>
 
                 <div>
+                    {isPending && (
+                        <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                            <Loader2 size={50} className="animate-spin" />
+                            Loading Reviews...
+                        </div>
+                    )}
                     <Carousel
                         opts={{
                             align: 'center',
@@ -72,8 +84,8 @@ export default function Testimonials() {
                         className="w-full"
                     >
                         <CarouselContent>
-                            {bestReviews &&
-                                bestReviews.map((review) => (
+                            {data &&
+                                data?.map((review) => (
                                     <CarouselItem
                                         key={review.rating?._id}
                                         className="md:basis-1/2 lg:basis-1/3"
@@ -107,7 +119,7 @@ export default function Testimonials() {
                                 ))}
                         </CarouselContent>
                     </Carousel>
-                    {bestReviews.length === 0 && (
+                    {data?.length === 0 && (
                         <div className="text-red-600 text-center text-2xl mt-10">
                             No reviews for now
                         </div>

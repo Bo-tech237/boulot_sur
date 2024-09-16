@@ -3,19 +3,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { useStableQuery } from '@/hooks/useStableQuery';
-import { FileStack } from 'lucide-react';
+import { FileStack, Loader2 } from 'lucide-react';
 import { api } from '../../../../convex/_generated/api';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
 export default function AllRecruiters() {
-    const recruitersWithUsers = useStableQuery(api.recruiters.getAllRecruiters);
+    const { data, isPending, error } = useQuery(
+        convexQuery(api.recruiters.getAllRecruiters, {})
+    );
 
-    if (recruitersWithUsers === undefined) {
-        return (
-            <div className="flex py-5 items-center justify-center">
-                Loading Recruiters...
-            </div>
-        );
-    }
+    // const recruitersWithUsers = useStableQuery(api.recruiters.getAllRecruiters);
+
+    // if (recruitersWithUsers === undefined) {
+    //     return (
+    //         <div className="flex py-5 items-center justify-center">
+    //             Loading Recruiters...
+    //         </div>
+    //     );
+    // }
 
     return (
         <div>
@@ -32,8 +38,15 @@ export default function AllRecruiters() {
                 </div>
 
                 <div className="flex flex-col gap-8 mt-8">
-                    {recruitersWithUsers !== null &&
-                        recruitersWithUsers.map((recruiterWithUser) => (
+                    {isPending && (
+                        <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                            <Loader2 size={50} className="animate-spin" />
+                            Loading Recruiters...
+                        </div>
+                    )}
+
+                    {data !== null &&
+                        data?.map((recruiterWithUser) => (
                             <div
                                 key={recruiterWithUser.recruiter._id}
                                 className="transition-all duration-500 ease-in-out hover:-translate-y-2"
@@ -65,7 +78,7 @@ export default function AllRecruiters() {
                                 </Link>
                             </div>
                         ))}
-                    {recruitersWithUsers.length === 0 && (
+                    {data?.length === 0 && (
                         <div className="text-red-900 text-center text-2xl">
                             No recruiter availble
                         </div>

@@ -27,19 +27,7 @@ function MagicLinkAuth() {
     });
 
     async function onSubmit(data: magicLinkTypes) {
-        const result = await magicLinkAuth(data);
-
-        if (result?.success === false) {
-            return form.setError('root', { message: result.message });
-        }
-
-        void signIn('email', data);
-
-        toast({
-            variant: 'success',
-            title: 'You have log in successfully',
-            description: `${new Date().toUTCString()}`,
-        });
+        void signIn('brevo', data);
 
         form.reset();
     }

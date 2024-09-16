@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { FileStack } from 'lucide-react';
+import { FileStack, Loader2 } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useStableQuery } from '@/hooks/useStableQuery';
 import { useQuery } from '@tanstack/react-query';
@@ -13,17 +13,17 @@ export default function CategoryList() {
     const { data, isPending, error } = useQuery(
         convexQuery(api.categories.getCategoriesWithTotalJobs, {})
     );
-    const categoriesResults = useStableQuery(
-        api.categories.getCategoriesWithTotalJobs
-    );
+    // const categoriesResults = useStableQuery(
+    //     api.categories.getCategoriesWithTotalJobs
+    // );
 
-    if (categoriesResults === undefined) {
-        return (
-            <div className="flex py-5 items-center justify-center">
-                Loading Categories...
-            </div>
-        );
-    }
+    // if (categoriesResults === undefined) {
+    //     return (
+    //         <div className="flex py-5 items-center justify-center">
+    //             Loading Categories...
+    //         </div>
+    //     );
+    // }
 
     return (
         <div>
@@ -39,7 +39,8 @@ export default function CategoryList() {
                     </p>
                 </div>
                 {isPending && (
-                    <div className="flex py-5 items-center justify-center">
+                    <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                        <Loader2 size={50} className="animate-spin" />
                         Loading Categories...
                     </div>
                 )}

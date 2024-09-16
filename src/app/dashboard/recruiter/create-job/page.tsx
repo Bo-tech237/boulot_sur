@@ -4,8 +4,6 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Create Job',
-
-    description: 'Find your dream job in Cameroon!',
 };
 
 async function CreateJob() {

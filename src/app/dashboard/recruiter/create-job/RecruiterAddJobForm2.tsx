@@ -18,8 +18,10 @@ import { UseFormReturn } from 'react-hook-form';
 import { FormWrapper } from '@/components/forms/formWrapper';
 import { jobTypes } from '@/constants/data';
 import { Doc } from '../../../../../convex/_generated/dataModel';
+import { Loader2 } from 'lucide-react';
 
 type Props = {
+    isPending: boolean;
     categories: Doc<'categories'>[];
     form: UseFormReturn<
         {
@@ -44,10 +46,11 @@ type Props = {
     >;
 };
 
-function RecruiterAddJobForm2({ categories, form }: Props) {
-    if (categories === undefined) {
+function RecruiterAddJobForm2({ categories, form, isPending }: Props) {
+    if (isPending) {
         return (
-            <div className="flex py-5 items-center justify-center">
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
                 Loading Categories...
             </div>
         );

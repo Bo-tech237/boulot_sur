@@ -21,6 +21,8 @@ import { api } from '../../convex/_generated/api';
 import { useMutation } from 'convex/react';
 import { Id } from '../../convex/_generated/dataModel';
 import { useStableQuery } from '@/hooks/useStableQuery';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 
 type Props = {
     precision?: number;

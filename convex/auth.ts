@@ -6,7 +6,7 @@ export const { auth, signIn, signOut, store } = convexAuth({
     providers: [
         Google,
         {
-            id: 'email',
+            id: 'brevo',
             type: 'email',
             from: process.env.GMAIL_USER!,
             server: {},
@@ -27,15 +27,14 @@ export const { auth, signIn, signOut, store } = convexAuth({
                             name: email,
                         },
                     ],
-                    subject: 'Boulot sur Login - Magic Link',
+                    subject: 'Sign in to Boulot sur',
                     htmlContent: `
               <html>
                 <head></head>
                 <body>
                   <p>Hello,</p>
-                  <p>Click <a href="${url}">here</a> to login and indulge in the magic of MioZio!</p>
-                  <p>Your secure login awaits for quick and delicious online orders.</p>
-                  <p>Bon appétit! The MioZio Team 🎉</p>
+                  <p>Click <a href="${url}">here</a> to login!</p>
+                  <p>Your secure login awaits for quick jobs.</p>
                 </body>
               </html>
             `,
@@ -53,7 +52,7 @@ export const { auth, signIn, signOut, store } = convexAuth({
                 })
                     .then((response) => response.json())
                     .then((result) => {
-                        console.log(result);
+                        console.log('magic error', result);
                     })
                     .catch((error) => {
                         console.error('Error:', error);
