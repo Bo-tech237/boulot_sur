@@ -11,7 +11,7 @@ export const getAllCategories = query({
     handler: async (ctx) => {
         const categories = await ctx.db
             .query('categories')
-            .order('desc')
+            .order('asc')
             .collect();
 
         return categories;
@@ -23,7 +23,7 @@ export const getCategoriesWithTotalJobs = query({
     handler: async (ctx) => {
         const categories = await ctx.db
             .query('categories')
-            .order('desc')
+            .order('asc')
             .collect();
 
         const categoryWithTotalJobs = await asyncMap(
@@ -52,7 +52,7 @@ export const getHomeCategories = query({
     handler: async (ctx) => {
         const categories = await ctx.db
             .query('categories')
-            .order('desc')
+            .order('asc')
             .take(6);
 
         const categoryWithTotalJobs = await asyncMap(
