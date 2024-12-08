@@ -12,7 +12,16 @@ export default defineSchema({
         phone: v.optional(v.string()),
         phoneVerificationTime: v.optional(v.number()),
         isAnonymous: v.optional(v.boolean()),
-        role: v.optional(v.string()),
+        roles: v.optional(
+            v.array(
+                v.union(
+                    v.literal('user'),
+                    v.literal('admin'),
+                    v.literal('recruiter'),
+                    v.literal('applicant')
+                )
+            )
+        ),
     }).index('email', ['email']),
 
     recruiters: defineTable({
@@ -40,7 +49,7 @@ export default defineSchema({
                 id: v.string(),
             })
         ),
-        fileId: v.id('_storage'),
+        fileId: v.optional(v.id('_storage')),
         rating: v.optional(v.number()),
         updatedAt: v.optional(v.number()),
     }).index('byUserId', ['userId']),
@@ -97,15 +106,28 @@ export default defineSchema({
         updatedAt: v.optional(v.number()),
     })
         .index('byApplicantId', ['applicantId'])
+        .index('byApplicantId_Status', ['applicantId', 'status'])
         .index('byRecruiterId', ['recruiterId'])
         .index('byJobId', ['jobId'])
+        .index('byJobId_Status', ['jobId', 'status'])
         .index('by_RecruiterId_ApplicantId', ['recruiterId', 'applicantId'])
         .index('by_RecruiterId_JobId', ['recruiterId', 'jobId'])
         .index('by_ApplicantId_JobId', ['applicantId', 'jobId'])
+        .index('by_RecruiterId_JobId_Status', [
+            'recruiterId',
+            'jobId',
+            'status',
+        ])
         .index('by_ApplicantId_RecruiterId_JobId', [
             'applicantId',
             'recruiterId',
             'jobId',
+        ])
+        .index('by_RecruiterId_ApplicantId_JobId_Status', [
+            'recruiterId',
+            'applicantId',
+            'jobId',
+            'status',
         ]),
 
     ratings: defineTable({

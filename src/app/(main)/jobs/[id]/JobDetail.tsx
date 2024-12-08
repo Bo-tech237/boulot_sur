@@ -9,7 +9,8 @@ import H1 from '@/components/ui/h1';
 import { formatMoney } from '@/lib/friendly-time';
 import { api } from '../../../../../convex/_generated/api';
 import { Id } from '../../../../../convex/_generated/dataModel';
-import { useStableQuery } from '@/hooks/useStableQuery';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 import { Loader2 } from 'lucide-react';
 
 type Props = {
@@ -17,15 +18,26 @@ type Props = {
 };
 
 function JobDetail({ id }: Props) {
-    const job = useStableQuery(api.jobs.getJobById, {
-        jobId: id as Id<'jobs'>,
-    });
+    const {
+        data: job,
+        isPending,
+        error,
+    } = useQuery(convexQuery(api.jobs.getJobById, { jobId: id as Id<'jobs'> }));
 
-    if (job === undefined) {
+    if (isPending) {
         return (
             <div className="flex gap-2 text-lg py-5 items-center justify-center">
                 <Loader2 size={50} className="animate-spin" />
-                Loading Job Detail...
+                Loading Job details...
+            </div>
+        );
+    }
+
+    if (!job) {
+        console.log('error', error);
+        return (
+            <div className="flex py-10 items-center justify-center text-red-900">
+                No job available
             </div>
         );
     }

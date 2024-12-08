@@ -11,13 +11,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from './ui/dialog';
-import { useRouter } from 'next/navigation';
-import { toast } from './ui/use-toast';
 import { handleError } from '@/lib/handleError';
 import { ReactNode, useState, useTransition } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
+import { useToast } from '@/hooks/use-toast';
 
 type Props = {
     id: Id<'jobs'>;
@@ -25,26 +24,34 @@ type Props = {
 };
 
 function DeleteJobsDialog({ id, children }: Props) {
-    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
     const deleteJob = useMutation(api.jobs.deleteJob);
 
     const [isPending, startTransition] = useTransition();
 
+    const { toast } = useToast();
+
     async function handleDelete() {
         try {
             const deletedJob = await deleteJob({ jobId: id });
 
+            if (deletedJob.success === false) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Delete Job',
+                    description: deletedJob.message,
+                });
+                return setIsOpen(false);
+            }
+
             toast({
                 variant: 'success',
-                title: deletedJob.message,
-                description: `${new Date().toUTCString()}`,
+                title: 'Delete Job',
+                description: deletedJob.message,
             });
 
-            setIsOpen(false);
-
-            return router.push('/jobs');
+            return setIsOpen(false);
         } catch (error) {
             handleError(error);
         }
@@ -65,20 +72,22 @@ function DeleteJobsDialog({ id, children }: Props) {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="">
-                        <div className="w-full my-4 flex items-center justify-between gap-3">
-                            <DialogClose asChild>
-                                <Button variant="secondary" type="button">
-                                    Close
-                                </Button>
-                            </DialogClose>
+                        <div className="w-full my-4 flex gap-2">
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => setIsOpen(false)}
+                                className="flex-1"
+                            >
+                                Close
+                            </Button>
 
                             <Button
                                 disabled={isPending}
-                                className="flex gap-2"
+                                className="flex-1 gap-2"
                                 type="button"
                                 onClick={() => startTransition(handleDelete)}
                                 variant="destructive"
-                                size="sm"
                             >
                                 {isPending && (
                                     <Loader2

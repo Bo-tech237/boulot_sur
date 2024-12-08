@@ -5,6 +5,18 @@ import { v } from 'convex/values';
 import { getManyFrom } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
 import { auth } from './auth';
+import { getAuthUserId } from '@convex-dev/auth/server';
+import { hasPermission } from './lib/permissions';
+
+const ApplicationStatuses = {
+    APPLIED: 'applied' as const,
+    ACCEPTED: 'accepted' as const,
+    REJECTED: 'rejected' as const,
+    SHORTLISTED: 'shortlisted' as const,
+    DELETED: 'deleted' as const,
+    CANCELLED: 'cancelled' as const,
+    FINISHED: 'finished' as const,
+};
 
 export const getAllJobs = query({
     args: { paginationOpts: paginationOptsValidator },
@@ -98,7 +110,7 @@ export const getJobsByCategory = query({
 export const getAllRecruiterJobsWithoutId = query({
     args: {},
     handler: async (ctx) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -106,7 +118,7 @@ export const getAllRecruiterJobsWithoutId = query({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'recruiter') {
+        if (!user || !hasPermission(user, 'jobs', 'view')) {
             return;
         }
 
@@ -139,7 +151,7 @@ export const createJob = mutation({
         companyLogo: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -147,7 +159,7 @@ export const createJob = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'recruiter') {
+        if (!user || !hasPermission(user, 'jobs', 'create')) {
             return {
                 success: false,
                 message: 'You have no permissions to add jobs',
@@ -204,7 +216,7 @@ export const updateJob = mutation({
         companyLogo: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -213,7 +225,7 @@ export const updateJob = mutation({
         const user = await ctx.db.get(userId);
         const job = await ctx.db.get(args.jobId);
 
-        if (user?.role !== 'recruiter') {
+        if (!user || !hasPermission(user, 'jobs', 'update')) {
             return {
                 success: false,
                 message: 'You have no permissions to update jobs',
@@ -250,7 +262,7 @@ export const updateJob = mutation({
 export const deleteJob = mutation({
     args: { jobId: v.id('jobs') },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -258,7 +270,7 @@ export const deleteJob = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'recruiter') {
+        if (!user || !hasPermission(user, 'jobs', 'delete')) {
             return {
                 success: false,
                 message: 'You have no permissions to delete jobs',
@@ -279,6 +291,21 @@ export const deleteJob = mutation({
             return {
                 success: false,
                 message: 'No job found',
+            };
+        }
+
+        const isDeletable = myApplications.some(
+            (myApplication) =>
+                myApplication.status === ApplicationStatuses.FINISHED ||
+                myApplication.status === ApplicationStatuses.REJECTED ||
+                myApplication.status === ApplicationStatuses.CANCELLED ||
+                myApplication.status === ApplicationStatuses.DELETED
+        );
+
+        if (isDeletable) {
+            return {
+                success: false,
+                message: 'You still have some active applications!',
             };
         }
 

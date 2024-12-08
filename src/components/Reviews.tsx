@@ -20,9 +20,6 @@ import { Loader2, Star } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useMutation } from 'convex/react';
 import { Id } from '../../convex/_generated/dataModel';
-import { useStableQuery } from '@/hooks/useStableQuery';
-import { useQuery } from '@tanstack/react-query';
-import { convexQuery } from '@convex-dev/react-query';
 
 type Props = {
     precision?: number;
@@ -43,32 +40,16 @@ export default function Reviews({
     onRating,
 }: Props) {
     const createComment = useMutation(api.comments.createComment);
-    const updateComment = useMutation(api.comments.updateComment);
-    const comment = useStableQuery(api.comments.getCommentByUserId, {
-        userId: application.userId as Id<'users'>,
-        jobId: application.jobId as Id<'jobs'>,
-    });
-    const rating = useStableQuery(api.ratings.getRatingByUser, {
-        applicantId: application.applicantId as Id<'users'>,
-        jobId: application.jobId as Id<'jobs'>,
-        recruiterId: application.recruiterId as Id<'users'>,
-        userId: application.userId as Id<'users'>,
-    });
+    const createRating = useMutation(api.ratings.createRating);
     const [activeStar, setActiveStar] = useState(-1);
     const [hoverActiveStar, setHoverActiveStar] = useState(-1);
     const [isHovered, setIsHovered] = useState(false);
     const ratingContainerRef = useRef<HTMLDivElement>(null);
     const [hasMounted, setHasMounted] = useState(false);
-    const updateRatings = useMutation(api.ratings.updateRatings);
     const { toast } = useToast();
-
-    console.log('userComent:', comment, 'userRating:', rating);
 
     const form = useForm<commentTypes>({
         resolver: zodResolver(commentSchema),
-        defaultValues: {
-            text: comment?.text,
-        },
     });
 
     useEffect(() => {
@@ -116,79 +97,37 @@ export default function Reviews({
         console.log(value, activeStar);
 
         try {
-            if (comment === undefined || rating === undefined) {
-                return (
-                    <div className="flex py-10 items-center justify-center">
-                        Loading Reviews...
-                    </div>
-                );
+            const result = await createRating({
+                rating: activeStar,
+                applicantId: application.applicantId,
+                jobId: application.jobId,
+                recruiterId: application.recruiterId,
+            });
+
+            if (result?.success === false) {
+                return form.setError('root', { message: result.message });
             }
-            setActiveStar(rating?.ratings!);
 
-            if (comment) {
-                const result = await updateRatings({
-                    rating: activeStar!,
-                    applicantId: application.applicantId,
-                    jobId: application.jobId,
-                    recruiterId: application.recruiterId,
-                });
+            const newComment = await createComment({
+                userId: application.userId as Id<'users'>,
+                jobId: application.jobId as Id<'jobs'>,
+                text: value.text,
+            });
 
-                if (result?.success === false) {
-                    return form.setError('root', { message: result.message });
-                }
-
-                const updatedComment = await updateComment({
-                    commentId: comment?._id!,
-                    text: value.text,
-                });
-
-                if (updatedComment.success === false) {
-                    form.reset();
-                    return form.setError('root', {
-                        message: updatedComment.message,
-                    });
-                }
-
-                toast({
-                    variant: 'success',
-                    title: result.message,
-                    description: `${new Date().toLocaleDateString()}`,
-                });
+            if (newComment.success === false) {
                 form.reset();
-                onRating();
-            } else {
-                const result = await updateRatings({
-                    rating: activeStar!,
-                    applicantId: application.applicantId,
-                    jobId: application.jobId,
-                    recruiterId: application.recruiterId,
+                return form.setError('root', {
+                    message: newComment.message,
                 });
-
-                if (result?.success === false) {
-                    return form.setError('root', { message: result.message });
-                }
-
-                const newComment = await createComment({
-                    userId: application.userId as Id<'users'>,
-                    jobId: application.jobId as Id<'jobs'>,
-                    text: value.text,
-                });
-
-                if (newComment.success === false) {
-                    form.reset();
-                    return form.setError('root', {
-                        message: newComment.message,
-                    });
-                }
-
-                toast({
-                    variant: 'success',
-                    title: result.message,
-                    description: `${new Date().toLocaleDateString()}`,
-                });
-                form.reset();
-                onRating();
             }
+
+            toast({
+                variant: 'success',
+                title: 'Create Rating',
+                description: result?.message,
+            });
+            form.reset();
+            onRating();
         } catch (error) {
             handleError(error);
             console.log('catch error', error);
@@ -210,7 +149,7 @@ export default function Reviews({
                     onMouseLeave={handleMouseLeave}
                     ref={ratingContainerRef}
                 >
-                    {[...new Array(totalStars)].map((arr, index) => {
+                    {[...new Array(totalStars)].map((_, index) => {
                         const activeState = isHovered
                             ? hoverActiveStar
                             : activeStar;
@@ -283,10 +222,19 @@ export default function Reviews({
                                 </FormItem>
                             )}
                         />
-                        <div className="py-4">
+                        <div className="py-4 flex gap-2">
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => onRating()}
+                                className="flex-1"
+                            >
+                                Close
+                            </Button>
                             <Button
                                 type="submit"
                                 disabled={form.formState.isSubmitting}
+                                className="flex-1"
                             >
                                 <span className="flex items-center justify-center gap-1">
                                     {form.formState.isSubmitting && (
@@ -295,7 +243,7 @@ export default function Reviews({
                                             className="animate-spin"
                                         />
                                     )}
-                                    Apply Now
+                                    Submit
                                 </span>
                             </Button>
                         </div>

@@ -4,9 +4,8 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { ConvexAuthNextjsServerProvider } from '@convex-dev/auth/nextjs/server';
-import ConvexClientProvider from '../../providers/ConvexClientProvider';
+import ConvexClientProvider from '../../providers/QueryClientProvider';
 import { Toaster } from '@/components/ui/toaster';
-import TanStackProvider from '../../providers/QueryClientProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,20 +27,17 @@ export default async function RootLayout({
             <html lang="en" suppressHydrationWarning>
                 <body className={inter.className}>
                     <ConvexClientProvider>
-                        <TanStackProvider>
-                            <ThemeProvider
-                                attribute="class"
-                                defaultTheme="system"
-                                enableSystem
-                                disableTransitionOnChange
-                            >
-                                {children}
-
-                                <Toaster />
-                                <ScrollToTop />
-                            </ThemeProvider>
-                        </TanStackProvider>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                            disableTransitionOnChange
+                        >
+                            {children}
+                        </ThemeProvider>
                     </ConvexClientProvider>
+                    <ScrollToTop />
+                    <Toaster />
                 </body>
             </html>
         </ConvexAuthNextjsServerProvider>

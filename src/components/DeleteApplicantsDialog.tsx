@@ -65,20 +65,22 @@ function DeleteApplicantsDialog({ id, children }: Props) {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="">
-                        <div className="w-full my-4 flex items-center justify-between gap-3">
-                            <DialogClose asChild>
-                                <Button variant="secondary" type="button">
-                                    Close
-                                </Button>
-                            </DialogClose>
+                        <div className="w-full my-4 flex gap-2">
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => setIsOpen(false)}
+                                className="flex-1"
+                            >
+                                Close
+                            </Button>
 
                             <Button
                                 disabled={isPending}
-                                className="flex gap-2"
+                                className="flex-1 gap-2"
                                 type="button"
                                 onClick={() => startTransition(handleDelete)}
                                 variant="destructive"
-                                size="sm"
                             >
                                 {isPending && (
                                     <Loader2

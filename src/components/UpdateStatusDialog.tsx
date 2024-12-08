@@ -13,8 +13,11 @@ import {
 } from './ui/dialog';
 import { ReactNode, useState } from 'react';
 import { SelectForm } from './SelectForm';
-import { useSession } from 'next-auth/react';
 import { ApplicationDataType } from '@/types/applications';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
+import { Loader2 } from 'lucide-react';
+import { api } from '../../convex/_generated/api';
 
 type Props = {
     application: ApplicationDataType;
@@ -23,8 +26,28 @@ type Props = {
 };
 
 function UpdateStatusDialog({ application, children }: Props) {
-    const { data: session } = useSession();
     const [isOpen, setIsOpen] = useState(false);
+    const { data, isPending, error } = useQuery(
+        convexQuery(api.users.getUser, {})
+    );
+
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading User...
+            </div>
+        );
+    }
+
+    if (!data || !data.roles) {
+        console.log('error:', error);
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                User not available
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -37,7 +60,7 @@ function UpdateStatusDialog({ application, children }: Props) {
                         <DialogTitle>Are you sure?</DialogTitle>
                         <DialogDescription>
                             Do you want to change{' '}
-                            {session?.user?.role === 'recruiter'
+                            {data?.roles.some((role) => role === 'recruiter')
                                 ? application?.applicant?.name
                                 : 'your'}{' '}
                             status?
@@ -48,14 +71,6 @@ function UpdateStatusDialog({ application, children }: Props) {
                         applicationId={application?._id}
                         onUpdate={() => setIsOpen(false)}
                     />
-
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline" type="button">
-                                Close
-                            </Button>
-                        </DialogClose>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>

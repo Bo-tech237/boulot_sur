@@ -3,12 +3,23 @@ import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
-import { auth } from './auth';
+import { getAuthUserId } from '@convex-dev/auth/server';
+import { hasPermission } from './lib/permissions';
+
+const ApplicationStatuses = {
+    APPLIED: 'applied' as const,
+    ACCEPTED: 'accepted' as const,
+    REJECTED: 'rejected' as const,
+    SHORTLISTED: 'shortlisted' as const,
+    DELETED: 'deleted' as const,
+    CANCELLED: 'cancelled' as const,
+    FINISHED: 'finished' as const,
+};
 
 export const getAllApplictions = query({
     args: {},
     handler: async (ctx) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -60,7 +71,7 @@ export const getAllApplictions = query({
 export const createApplication = mutation({
     args: { sop: v.string(), jobId: v.id('jobs') },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             return {
@@ -71,7 +82,7 @@ export const createApplication = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'applicant') {
+        if (!user || !hasPermission(user, 'applications', 'create')) {
             return { success: false, message: 'You must be an applicant' };
         }
 
@@ -80,21 +91,18 @@ export const createApplication = mutation({
         // check count of active applications < limit
         // check user had < 10 active applications && check if user is not having any accepted jobs (user id)
         // store the data in applications
-        const appliedApplication = await ctx.db
+        const application = await ctx.db
             .query('applications')
             .withIndex('by_ApplicantId_JobId', (q) =>
                 q.eq('applicantId', user._id).eq('jobId', args.jobId)
             )
-            .filter((q) =>
-                q.or(
-                    q.neq(q.field('status'), 'accepted'),
-                    q.neq(q.field('status'), 'deleted'),
-                    q.neq(q.field('status'), 'cancelled')
-                )
-            )
             .first();
 
-        if (appliedApplication) {
+        if (
+            application &&
+            (application.status === ApplicationStatuses.APPLIED ||
+                application.status === ApplicationStatuses.SHORTLISTED)
+        ) {
             return {
                 success: false,
                 message: 'You have already applied for this job',
@@ -109,90 +117,75 @@ export const createApplication = mutation({
 
         const acceptedApplications = await ctx.db
             .query('applications')
-            .withIndex('byJobId', (q) => q.eq('jobId', args.jobId))
-            .filter((q) =>
-                q.or(
-                    q.neq(q.field('status'), 'rejected'),
-                    q.neq(q.field('status'), 'deleted'),
-                    q.neq(q.field('status'), 'cancelled'),
-                    q.neq(q.field('status'), 'finished')
-                )
+            .withIndex('byJobId_Status', (q) =>
+                q
+                    .eq('jobId', args.jobId)
+                    .eq('status', ApplicationStatuses.ACCEPTED)
             )
-            .collect();
+            .collect()
+            .then((applications) => applications.length);
 
-        const acceptedApplicationCount = acceptedApplications.length;
-
-        if (acceptedApplicationCount < foundJob.maxApplicants) {
-            const myActiveApplications = await ctx.db
-                .query('applications')
-                .withIndex('byApplicantId', (q) =>
-                    q.eq('applicantId', user._id)
-                )
-                .filter((q) =>
-                    q.or(
-                        q.neq(q.field('status'), 'rejected'),
-                        q.neq(q.field('status'), 'deleted'),
-                        q.neq(q.field('status'), 'cancelled'),
-                        q.neq(q.field('status'), 'finished')
-                    )
-                )
-                .collect();
-
-            const myActiveApplicationCount = myActiveApplications.length;
-
-            if (myActiveApplicationCount < 10) {
-                const acceptedJobs = await ctx.db
-                    .query('applications')
-                    .withIndex('byApplicantId', (q) =>
-                        q.eq('applicantId', user._id)
-                    )
-                    .filter((q) => q.eq(q.field('status'), 'accepted'))
-                    .collect();
-
-                const acceptedJobCount = acceptedJobs.length;
-
-                if (acceptedJobCount === 0) {
-                    const newApplication = await ctx.db.insert('applications', {
-                        applicantId: user._id,
-                        recruiterId: foundJob.userId,
-                        jobId: foundJob._id,
-                        status: 'applied',
-                        sop: args.sop,
-                    });
-
-                    if (newApplication) {
-                        await ctx.db.patch(foundJob._id, {
-                            activeApplications: acceptedApplicationCount + 1,
-                            updatedAt: Date.now(),
-                        });
-
-                        return {
-                            success: true,
-                            message: 'Job applied successfully',
-                        };
-                    } else {
-                        return {
-                            success: false,
-                            message: 'Invalid data received',
-                        };
-                    }
-                } else {
-                    return {
-                        success: false,
-                        message:
-                            'You already have an accepted job. Hence you cannot apply.',
-                    };
-                }
-            } else {
-                return {
-                    success: false,
-                    message:
-                        'You have 10 active applications. Hence you cannot apply.',
-                };
-            }
-        } else {
+        if (acceptedApplications >= foundJob.maxApplicants) {
             return { success: false, message: 'Application limit reached' };
         }
+
+        const myActiveApplicationsCount = await ctx.db
+            .query('applications')
+            .withIndex('byApplicantId', (q) => q.eq('applicantId', user._id))
+            .filter((q) =>
+                q.or(
+                    q.eq(q.field('status'), ApplicationStatuses.ACCEPTED),
+                    q.eq(q.field('status'), ApplicationStatuses.APPLIED),
+                    q.eq(q.field('status'), ApplicationStatuses.SHORTLISTED)
+                )
+            )
+            .collect()
+            .then((applications) => applications.length);
+
+        if (myActiveApplicationsCount >= 10) {
+            return {
+                success: false,
+                message:
+                    'You have 10 active applications. Hence you cannot apply.',
+            };
+        }
+
+        const acceptedJobsCount = await ctx.db
+            .query('applications')
+            .withIndex('byApplicantId_Status', (q) =>
+                q
+                    .eq('applicantId', user._id)
+                    .eq('status', ApplicationStatuses.ACCEPTED)
+            )
+            .collect()
+            .then((applications) => applications.length);
+
+        if (acceptedJobsCount > 0) {
+            return {
+                success: false,
+                message:
+                    'You already have an accepted job. Hence you cannot apply.',
+            };
+        }
+
+        const newApplicationId = await ctx.db.insert('applications', {
+            applicantId: user._id,
+            recruiterId: foundJob.userId,
+            jobId: foundJob._id,
+            status: ApplicationStatuses.APPLIED,
+            sop: args.sop,
+        });
+
+        if (!newApplicationId) {
+            return { success: false, message: 'Error try again' };
+        }
+
+        await ctx.db.patch(foundJob._id, {
+            activeApplications: acceptedApplications + 1,
+            updatedAt: Date.now(),
+        });
+
+        return { success: true, message: 'Job applied successfully' };
     },
 });
 
@@ -211,7 +204,7 @@ export const updateApplication = mutation({
     },
 
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -219,260 +212,158 @@ export const updateApplication = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role === 'recruiter') {
-            const application = await ctx.db.get(args.applicationId);
+        if (!user || !hasPermission(user, 'applications', 'update')) {
+            return {
+                success: false,
+                message: 'You do not have permission to update applications',
+            };
+        }
 
-            if (!application) {
-                return {
-                    success: false,
-                    message: 'Application not found',
-                };
-            }
+        const application = await ctx.db.get(args.applicationId);
+        if (!application) {
+            return {
+                success: false,
+                message: 'Application not found',
+            };
+        }
+        const job = await ctx.db.get(application?.jobId);
+        if (!job) {
+            return {
+                success: false,
+                message: 'Job does not exist',
+            };
+        }
 
-            const job = await ctx.db.get(application.jobId);
-
-            if (!job) {
-                return {
-                    success: false,
-                    message: 'Job does not exist',
-                };
-            }
-
-            if (args.status === 'accepted') {
-                // get job id from application
-                // get job info for maxPositions count
-                // count applications that are already accepted
-                // compare and if condition is satisfied, then save
-
-                const acceptedApplication = await ctx.db
+        if (user.roles?.includes('recruiter')) {
+            if (
+                args.status === ApplicationStatuses.ACCEPTED &&
+                (application.status === ApplicationStatuses.APPLIED ||
+                    application.status === ApplicationStatuses.SHORTLISTED)
+            ) {
+                const acceptedApplicationCount = await ctx.db
                     .query('applications')
-                    .withIndex('by_ApplicantId_RecruiterId_JobId', (q) =>
+                    .withIndex('by_RecruiterId_JobId_Status', (q) =>
                         q
-                            .eq('applicantId', application.applicantId)
                             .eq('recruiterId', user._id)
                             .eq('jobId', job._id)
+                            .eq('status', ApplicationStatuses.ACCEPTED)
                     )
-                    .filter((q) =>
-                        q.or(
-                            q.eq(q.field('status'), 'accepted'),
-                            q.eq(q.field('status'), 'finished'),
-                            q.eq(q.field('status'), 'rejected'),
-                            q.eq(q.field('status'), 'cancelled')
-                        )
-                    )
-                    .first();
+                    .collect()
+                    .then((acceptedApplication) => acceptedApplication.length);
 
-                console.log('testAccepted', application);
-
-                if (acceptedApplication) {
-                    return {
-                        success: false,
-                        message: 'This application has already been accepted.',
-                    };
-                }
-
-                const acceptedApplications = await ctx.db
-                    .query('applications')
-                    .withIndex('by_RecruiterId_JobId', (q) =>
-                        q.eq('recruiterId', user._id).eq('jobId', job._id)
-                    )
-                    .filter((q) => q.eq(q.field('status'), 'accepted'))
-                    .collect();
-
-                const acceptedApplicationCount = acceptedApplications.length;
-
-                if (acceptedApplicationCount < job.maxPositions) {
-                    // accepted
-                    await ctx.db.patch(application._id, {
-                        status: args.status,
-                        updatedAt: Date.now(),
-                    });
-
-                    // update many
-                    const applicantStatus = await ctx.db
-                        .query('applications')
-                        .withIndex('byApplicantId', (q) =>
-                            q.eq('applicantId', application.applicantId)
-                        )
-                        .filter((q) =>
-                            q.and(
-                                q.neq(q.field('_id'), application._id),
-                                q.or(
-                                    q.eq(q.field('status'), 'applied'),
-                                    q.eq(q.field('status'), 'shortlisted')
-                                )
-                            )
-                        )
-                        .collect();
-
-                    const updatedApplicantStatus = await asyncMap(
-                        applicantStatus,
-                        async (application) => {
-                            await ctx.db.patch(application._id, {
-                                status: 'cancelled',
-                                updatedAt: Date.now(),
-                            });
-
-                            return { ...application };
-                        }
-                    );
-
-                    if (updatedApplicantStatus) {
-                        await ctx.db.patch(job._id, {
-                            acceptedApplicants: acceptedApplicationCount + 1,
-                            updatedAt: Date.now(),
-                        });
-
-                        return {
-                            success: true,
-                            message: `Application ${args.status} successfully`,
-                        };
-                    }
-                } else {
+                if (acceptedApplicationCount >= job.maxPositions) {
                     return {
                         success: false,
                         message:
                             'All positions for this job are already filled',
                     };
                 }
-            } else {
-                if (args.status === 'finished') {
-                    // change cancelled to applied will be done here...
 
-                    const application = await ctx.db
-                        .query('applications')
-                        .withIndex('byRecruiterId', (q) =>
-                            q.eq('recruiterId', user._id)
-                        )
-                        .filter((q) =>
-                            q.and(
-                                q.eq(q.field('_id'), args.applicationId),
-                                q.eq(q.field('status'), 'accepted')
-                            )
-                        )
-                        .unique();
-
-                    console.log('testFinished', application);
-
-                    if (!application) {
-                        return {
-                            success: false,
-                            message: 'Application status can not be updated',
-                        };
-                    }
-
-                    await ctx.db.patch(args.applicationId, {
-                        status: args.status,
-                        updatedAt: Date.now(),
-                    });
-
-                    return {
-                        success: true,
-                        message: `Job ${args.status} successfully`,
-                    };
-                } else if (args.status === 'shortlisted') {
-                    const application = await ctx.db
-                        .query('applications')
-                        .withIndex('byRecruiterId', (q) =>
-                            q.eq('recruiterId', user._id)
-                        )
-                        .filter((q) =>
-                            q.and(
-                                q.eq(q.field('_id'), args.applicationId),
-                                q.eq(q.field('status'), 'applied')
-                            )
-                        )
-                        .unique();
-
-                    console.log('testShortlisted', application);
-
-                    if (!application) {
-                        return {
-                            success: false,
-                            message: 'Application status can not be updated',
-                        };
-                    }
-
-                    await ctx.db.patch(args.applicationId, {
-                        status: args.status,
-                        updatedAt: Date.now(),
-                    });
-
-                    return {
-                        success: true,
-                        message: `Application ${args.status} successfully`,
-                    };
-                } else {
-                    const application = await ctx.db
-                        .query('applications')
-                        .withIndex('byRecruiterId', (q) =>
-                            q.eq('recruiterId', user._id)
-                        )
-                        .filter((q) =>
-                            q.and(
-                                q.eq(q.field('_id'), args.applicationId),
-                                q.or(
-                                    q.eq(q.field('status'), 'applied'),
-                                    q.eq(q.field('status'), 'shortlisted')
+                await ctx.db.patch(args.applicationId, {
+                    status: args.status,
+                    updatedAt: Date.now(),
+                });
+                // Cancel other pending applications for the same applicant
+                const applicantStatus = await ctx.db
+                    .query('applications')
+                    .withIndex('byApplicantId', (q) =>
+                        q.eq('applicantId', application.applicantId)
+                    )
+                    .filter((q) =>
+                        q.and(
+                            q.neq(q.field('_id'), args.applicationId),
+                            q.or(
+                                q.eq(
+                                    q.field('status'),
+                                    ApplicationStatuses.APPLIED
+                                ),
+                                q.eq(
+                                    q.field('status'),
+                                    ApplicationStatuses.SHORTLISTED
                                 )
                             )
                         )
-                        .unique();
-
-                    console.log('testElse', application);
-
-                    if (!application) {
-                        return {
-                            success: false,
-                            message: 'Application status can not be updated',
-                        };
-                    }
-
-                    await ctx.db.patch(args.applicationId, {
-                        status: args.status,
-                        updatedAt: Date.now(),
-                    });
-
-                    return {
-                        success: true,
-                        message: `Application ${args.status} successfully`,
-                    };
-                }
-            }
-        } else {
-            //Applicant can cancel
-
-            const application = await ctx.db
-                .query('applications')
-                .withIndex('byApplicantId', (q) =>
-                    q.eq('applicantId', user?._id!)
-                )
-                .filter((q) =>
-                    q.and(
-                        q.eq(q.field('_id'), args.applicationId),
-                        q.or(
-                            q.eq(q.field('status'), 'shortlisted'),
-                            q.eq(q.field('status'), 'applied')
-                        )
                     )
-                )
-                .unique();
+                    .collect();
 
-            if (!application) {
+                await asyncMap(applicantStatus, (app) =>
+                    ctx.db.patch(app._id, {
+                        status: ApplicationStatuses.CANCELLED,
+                        updatedAt: Date.now(),
+                    })
+                );
+                await ctx.db.patch(job._id, {
+                    acceptedApplicants: acceptedApplicationCount + 1,
+                    updatedAt: Date.now(),
+                });
+
+                return {
+                    success: true,
+                    message: `Application ${args.status} successfully`,
+                };
+            } else if (
+                args.status === 'rejected' &&
+                (application.status === 'applied' ||
+                    application.status === 'shortlisted')
+            ) {
+                await ctx.db.patch(args.applicationId, {
+                    status: args.status,
+                    updatedAt: Date.now(),
+                });
+                return {
+                    success: true,
+                    message: `Application ${args.status} successfully`,
+                };
+            } else if (
+                args.status === 'finished' &&
+                application.status === 'accepted'
+            ) {
+                await ctx.db.patch(args.applicationId, {
+                    status: args.status,
+                    updatedAt: Date.now(),
+                });
+                return {
+                    success: true,
+                    message: `Application ${args.status} successfully`,
+                };
+            } else if (
+                args.status === 'shortlisted' &&
+                application.status === 'applied'
+            ) {
+                await ctx.db.patch(args.applicationId, {
+                    status: args.status,
+                    updatedAt: Date.now(),
+                });
+                return {
+                    success: true,
+                    message: `Application ${args.status} successfully`,
+                };
+            } else {
                 return {
                     success: false,
-                    message: 'Application status can not be cancelled',
+                    message: `This application has already been ${application.status}.`,
                 };
             }
+        }
 
-            await ctx.db.patch(args.applicationId, {
-                status: args.status,
-                updatedAt: Date.now(),
-            });
-
+        if (user.roles?.includes('applicant')) {
+            if (
+                args.status === ApplicationStatuses.CANCELLED &&
+                (application.status === ApplicationStatuses.APPLIED ||
+                    application.status === ApplicationStatuses.SHORTLISTED)
+            ) {
+                await ctx.db.patch(args.applicationId, {
+                    status: args.status,
+                    updatedAt: Date.now(),
+                });
+                return {
+                    success: true,
+                    message: `Application ${args.status} successfully`,
+                };
+            }
             return {
-                success: true,
-                message: `Application ${args.status} successfully`,
+                success: false,
+                message: `This application has already been ${application.status}.`,
             };
         }
     },
@@ -481,7 +372,7 @@ export const updateApplication = mutation({
 export const deleteApplication = mutation({
     args: { applicationId: v.id('applications') },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -489,40 +380,39 @@ export const deleteApplication = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'applicant') {
+        if (!user || !hasPermission(user, 'applications', 'delete')) {
             return {
                 success: false,
                 message: 'You have no permissions to delete applications',
             };
         }
 
-        const application = await ctx.db
-            .query('applications')
-            .withIndex('byApplicantId', (q) => q.eq('applicantId', user?._id!))
-            .filter((q) =>
-                q.and(
-                    q.eq(q.field('_id'), args.applicationId),
-                    q.or(
-                        q.eq(q.field('status'), 'finished'),
-                        q.eq(q.field('status'), 'rejected'),
-                        q.eq(q.field('status'), 'cancelled')
-                    )
-                )
-            )
-            .first();
+        const application = await ctx.db.get(args.applicationId);
 
         if (!application) {
             return {
                 success: false,
-                message: 'This application is still active!',
+                message: 'Application not found',
             };
         }
 
-        await ctx.db.delete(args.applicationId);
+        if (
+            application.status === ApplicationStatuses.FINISHED ||
+            application.status === ApplicationStatuses.REJECTED ||
+            application.status === ApplicationStatuses.CANCELLED ||
+            application.status === ApplicationStatuses.DELETED
+        ) {
+            await ctx.db.delete(args.applicationId);
+
+            return {
+                success: true,
+                message: 'Application deleted successfully',
+            };
+        }
 
         return {
-            success: true,
-            message: 'Application deleted successfully',
+            success: false,
+            message: 'This application is still active!',
         };
     },
 });

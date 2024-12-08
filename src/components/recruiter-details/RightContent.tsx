@@ -6,6 +6,8 @@ type Props = {
 };
 
 export default function RightContent({ recruiter }: Props) {
+    if (!recruiter) return;
+
     return (
         <div className="col-span-12 lg:col-span-8">
             <div className="p-6 border rounded">

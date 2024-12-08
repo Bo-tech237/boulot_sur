@@ -27,11 +27,11 @@ function Footer() {
                         </Link>
                     </div>
 
-                    <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2">
                         {footerInfos.map((footerInfo, index) => (
                             <div
                                 key={index}
-                                className="text-center sm:text-left"
+                                className="text-center sm:text-left flex flex-col justify-center items-center"
                             >
                                 <p className="text-lg text-white font-medium">
                                     {footerInfo.title}
@@ -42,32 +42,14 @@ function Footer() {
                                         key={footerList.name}
                                         className="mt-8 space-y-4 text-sm"
                                     >
-                                        {footerList.name === 'Live Chat' ? (
-                                            <li>
-                                                <Link
-                                                    className="group flex justify-center gap-1.5 sm:justify-start"
-                                                    href={footerList.href}
-                                                >
-                                                    <span className="text-white transition-all duration-500 ease-in-out hover:text-base">
-                                                        {footerList.name}
-                                                    </span>
-
-                                                    <span className="relative flex h-2 w-2">
-                                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75"></span>
-                                                        <span className="relative inline-flex size-2 rounded-full bg-teal-500"></span>
-                                                    </span>
-                                                </Link>
-                                            </li>
-                                        ) : (
-                                            <li>
-                                                <Link
-                                                    className="text-white transition-all duration-500 ease-in-out hover:text-base"
-                                                    href={footerList.href}
-                                                >
-                                                    {footerList.name}
-                                                </Link>
-                                            </li>
-                                        )}
+                                        <li>
+                                            <Link
+                                                className="text-white transition-all duration-500 ease-in-out hover:text-base"
+                                                href={footerList.href}
+                                            >
+                                                {footerList.name}
+                                            </Link>
+                                        </li>
                                     </ul>
                                 ))}
                             </div>

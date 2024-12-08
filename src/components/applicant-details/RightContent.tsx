@@ -6,6 +6,8 @@ type Props = {
 };
 
 export default function RightContent({ applicant }: Props) {
+    if (!applicant || !applicant?.skills) return;
+
     return (
         <div className="col-span-12 lg:col-span-8">
             <div className="p-6 border rounded">
@@ -146,7 +148,7 @@ export default function RightContent({ applicant }: Props) {
                                     Project Manager
                                 </h6>
                                 <p className="mb-2 text-gray-500 dark:text-gray-300">
-                                    Jobcy Technology Pvt.Ltd - (Pressent)
+                                    Boulot sur Pvt.Ltd - (Pressent)
                                 </p>
                                 <p className="text-gray-500 dark:text-gray-300">
                                     There are many variations of passages of

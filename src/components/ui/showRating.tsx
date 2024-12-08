@@ -4,19 +4,19 @@ import React, { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 
 type Props = {
-    userRating?: number | undefined;
+    userRating?: number;
 };
 
 export function ShowRating({ userRating }: Props) {
     const [hasMounted, setHasMounted] = useState(false);
-    let activeStars: any = userRating;
+    let activeStars: number | undefined = userRating || 0;
     const totalStars = 5;
 
     useEffect(() => {
         setHasMounted(true);
     }, []);
 
-    if (!hasMounted) {
+    if (!hasMounted || activeStars === undefined) {
         return null;
     }
 
@@ -29,7 +29,7 @@ export function ShowRating({ userRating }: Props) {
                     textAlign: 'left',
                 }}
             >
-                {[...new Array(totalStars)].map((arr, index) => {
+                {[...new Array(totalStars)].map((_, index) => {
                     const activeState = activeStars;
                     const showEmptyIcon =
                         activeState === -1 || activeState < index + 1;

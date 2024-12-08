@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function LeftContent({ applicant, pathName }: Props) {
-    if (!applicant.skills) return;
+    if (!applicant || !applicant?.skills) return;
 
     return (
         <div className="col-span-12 lg:col-span-4">

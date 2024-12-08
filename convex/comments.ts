@@ -1,7 +1,8 @@
 import { query, mutation } from './_generated/server';
-import { ConvexError, v } from 'convex/values';
+import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
-import { auth } from './auth';
+import { getAuthUserId } from '@convex-dev/auth/server';
+import { hasPermission } from './lib/permissions';
 
 export const getBestReviews = query({
     args: {},
@@ -14,21 +15,7 @@ export const getBestReviews = query({
             const rating = await ctx.db
                 .query('ratings')
                 .withIndex('byJobId', (q) => q.eq('jobId', comment.jobId))
-                .filter((q) =>
-                    q.and(
-                        q.gte(q.field('ratings'), 3),
-                        q.or(
-                            q.and(
-                                q.eq(q.field('applicantId'), comment.userId),
-                                q.eq(q.field('category'), 'job')
-                            ),
-                            q.and(
-                                q.eq(q.field('recruiterId'), comment.userId),
-                                q.eq(q.field('category'), 'applicant')
-                            )
-                        )
-                    )
-                )
+                .filter((q) => q.gte(q.field('ratings'), 3))
                 .first();
 
             return { rating, comment, user };
@@ -49,6 +36,11 @@ export const getRecruiterReviews = query({
             .order('desc')
             .take(5);
 
+        const recruiter = await ctx.db
+            .query('recruiters')
+            .withIndex('byUserId', (q) => q.eq('userId', args.userId))
+            .unique();
+
         const reviews = await asyncMap(ratings, async (rating) => {
             const user = await ctx.db.get(rating.applicantId);
 
@@ -62,7 +54,7 @@ export const getRecruiterReviews = query({
             return { rating, comment, user };
         });
 
-        return reviews;
+        return { reviews, recruiter };
     },
 });
 
@@ -77,6 +69,15 @@ export const getApplicantReviews = query({
             .order('desc')
             .take(5);
 
+        const applicant = await ctx.db
+            .query('applicants')
+            .withIndex('byUserId', (q) => q.eq('userId', args.userId))
+            .unique();
+
+        if (!applicant || !applicant.fileId || !ratings) return;
+
+        const fileUrl = await ctx.storage.getUrl(applicant?.fileId);
+
         const reviews = await asyncMap(ratings, async (rating) => {
             const user = await ctx.db.get(rating.recruiterId);
 
@@ -90,7 +91,9 @@ export const getApplicantReviews = query({
             return { rating, comment, user };
         });
 
-        return reviews;
+        const applicantWithFileUrl = { ...applicant, fileUrl };
+
+        return { reviews, applicantWithFileUrl };
     },
 });
 
@@ -111,10 +114,19 @@ export const getCommentByUserId = query({
 export const createComment = mutation({
     args: { userId: v.id('users'), jobId: v.id('jobs'), text: v.string() },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
+        }
+
+        const user = await ctx.db.get(userId);
+
+        if (!user || !hasPermission(user, 'comments', 'create')) {
+            return {
+                success: false,
+                message: 'Insufficient permissions for this action',
+            };
         }
 
         const newComment = await ctx.db.insert('comments', {
@@ -140,10 +152,19 @@ export const createComment = mutation({
 export const updateComment = mutation({
     args: { commentId: v.id('comments'), text: v.string() },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
+        }
+
+        const user = await ctx.db.get(userId);
+
+        if (!user || !hasPermission(user, 'comments', 'delete')) {
+            return {
+                success: false,
+                message: 'Insufficient permissions for this action',
+            };
         }
 
         await ctx.db.patch(args.commentId, {

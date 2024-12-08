@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 import { Loader2 } from 'lucide-react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -50,10 +51,30 @@ type StatusType = {
 export function SelectForm({ applicationId, onUpdate }: Prop) {
     const updateApplication = useMutation(api.applications.updateApplication);
     const router = useRouter();
-    const { data: session } = useSession();
+    const { data, isPending, error } = useQuery(
+        convexQuery(api.users.getUser, {})
+    );
     const form = useForm<StatusType>({
         resolver: zodResolver(FormSchema),
     });
+
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading User...
+            </div>
+        );
+    }
+
+    if (!data || !data.roles) {
+        console.log('error:', error);
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                User not available
+            </div>
+        );
+    }
 
     async function onSubmit(data: StatusType) {
         const updatedApplication = await updateApplication({
@@ -67,11 +88,11 @@ export function SelectForm({ applicationId, onUpdate }: Prop) {
             });
         }
 
-        if (updatedApplication) {
+        if (updatedApplication?.success === true) {
             toast({
                 variant: 'success',
-                title: updatedApplication.message,
-                description: `${new Date().toUTCString()}`,
+                title: 'Updated Status',
+                description: updatedApplication.message,
             });
             onUpdate();
             form.reset();
@@ -84,7 +105,7 @@ export function SelectForm({ applicationId, onUpdate }: Prop) {
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="w-2/3 space-y-6"
+                className="w-full space-y-6"
             >
                 <FormField
                     control={form.control}
@@ -101,7 +122,9 @@ export function SelectForm({ applicationId, onUpdate }: Prop) {
                                         <SelectValue placeholder="Select a status to display" />
                                     </SelectTrigger>
                                 </FormControl>
-                                {session?.user?.role === 'recruiter' ? (
+                                {data?.roles?.some(
+                                    (role) => role === 'recruiter'
+                                ) && (
                                     <SelectContent>
                                         <SelectItem value="shortlisted">
                                             shortlist
@@ -116,7 +139,11 @@ export function SelectForm({ applicationId, onUpdate }: Prop) {
                                             finish
                                         </SelectItem>
                                     </SelectContent>
-                                ) : (
+                                )}
+
+                                {data?.roles?.some(
+                                    (role) => role === 'applicant'
+                                ) && (
                                     <SelectContent>
                                         <SelectItem value="cancelled">
                                             cancel
@@ -128,14 +155,29 @@ export function SelectForm({ applicationId, onUpdate }: Prop) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" disabled={form.formState.isSubmitting}>
-                    <span className="flex items-center justify-center gap-1">
-                        {form.formState.isSubmitting && (
-                            <Loader2 size={16} className="animate-spin" />
-                        )}
-                        Submit
-                    </span>
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        type="button"
+                        className="flex-1"
+                        onClick={() => onUpdate()}
+                    >
+                        Close
+                    </Button>
+
+                    <Button
+                        type="submit"
+                        disabled={form.formState.isSubmitting}
+                        className="flex-1"
+                    >
+                        <span className="flex items-center justify-center gap-1">
+                            {form.formState.isSubmitting && (
+                                <Loader2 size={16} className="animate-spin" />
+                            )}
+                            Submit
+                        </span>
+                    </Button>
+                </div>
                 <div
                     className="flex mt-2 items-end space-x-1"
                     aria-live="polite"

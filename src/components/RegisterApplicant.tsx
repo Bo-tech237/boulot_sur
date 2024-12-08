@@ -17,7 +17,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { useMutation } from 'convex/react';
@@ -26,6 +26,7 @@ import { Progress } from '@/components/ui/progress';
 
 function RegisterApplicant() {
     const createApplicant = useMutation(api.applicants.createApplicant);
+    const addApplicantFile = useMutation(api.applicants.addFileId);
     const generateUploadUrl = useMutation(api.uploads.generateUploadUrl);
     const { toast } = useToast();
     const router = useRouter();
@@ -57,9 +58,18 @@ function RegisterApplicant() {
     ]);
 
     async function onSubmit(data: applicantTypes) {
-        const postUrl = await generateUploadUrl();
-
         if (!data.fileId) return;
+
+        const newApplicant = await createApplicant({
+            education: data.education,
+            skills: data.skills,
+        });
+        console.log('NewApplicant', newApplicant);
+        if (newApplicant?.success === false) {
+            return form.setError('root', { message: newApplicant?.message });
+        }
+
+        const postUrl = await generateUploadUrl();
 
         const result = await fetch(postUrl, {
             method: 'POST',
@@ -70,32 +80,27 @@ function RegisterApplicant() {
         });
 
         if (!result) {
-            throw new Error(`Upload failed: ${JSON.stringify(result)}`);
+            return form.setError('root', { message: 'Upload failed' });
         }
 
         const { storageId } = await result.json();
 
-        console.log('just now', storageId, data.fileId, 'url', postUrl);
+        console.log('just now', storageId, 'url', postUrl, result);
 
-        const newApplicant = await createApplicant({
-            education: data.education,
-            skills: data.skills,
-            fileId: storageId,
+        const addFile = await addApplicantFile({ fileId: storageId });
+
+        if (addFile.success === false) {
+            return form.setError('root', { message: addFile.message });
+        }
+
+        toast({
+            variant: 'success',
+            title: 'Create Applicant',
+            description: newApplicant.message,
         });
-        console.log('NewApplicant', newApplicant);
-        if (newApplicant?.success === false) {
-            return form.setError('root', { message: newApplicant?.message });
-        }
-        if (newApplicant?.success === true) {
-            toast({
-                variant: 'success',
-                title: newApplicant.message,
-                description: `${new Date().toLocaleDateString()}`,
-            });
-            form.reset();
+        form.reset();
 
-            router.push('/dashboard');
-        }
+        router.push('/dashboard');
     }
 
     return (
@@ -141,9 +146,15 @@ function RegisterApplicant() {
                                         type="submit"
                                         disabled={form.formState.isSubmitting}
                                     >
-                                        {form.formState.isSubmitting
-                                            ? 'Submitting...'
-                                            : 'Submit'}
+                                        <span className="flex items-center justify-center gap-1">
+                                            {form.formState.isSubmitting && (
+                                                <Loader2
+                                                    size={16}
+                                                    className="animate-spin"
+                                                />
+                                            )}
+                                            Submit
+                                        </span>
                                     </Button>
                                 )}
                             </div>

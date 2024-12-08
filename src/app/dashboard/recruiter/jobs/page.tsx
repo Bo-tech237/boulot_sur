@@ -3,9 +3,7 @@
 import React from 'react';
 import { DataTable } from './data-table';
 import { columns } from './columns';
-import { Metadata } from 'next';
 import { api } from '../../../../../convex/_generated/api';
-import { useStableQuery } from '@/hooks/useStableQuery';
 import { useQuery } from '@tanstack/react-query';
 import { convexQuery } from '@convex-dev/react-query';
 import { Loader2 } from 'lucide-react';
@@ -21,26 +19,29 @@ function MyJobs() {
         convexQuery(api.jobs.getAllRecruiterJobsWithoutId, {})
     );
 
-    // const jobs = useStableQuery(api.jobs.getAllRecruiterJobsWithoutId);
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading Jobs...
+            </div>
+        );
+    }
 
-    // if (jobs === undefined) {
-    //     return (
-    //         <div className="flex h-screen items-center justify-center">
-    //             Loading Jobs...
-    //         </div>
-    //     );
-    // }
+    if (!data) {
+        console.log('Tanstact error:', error);
+
+        return (
+            <div className="flex py-10 items-center justify-center text-red-900 text-center">
+                No job available
+            </div>
+        );
+    }
 
     return (
         <div className="w-full py-10">
-            {isPending && (
-                <div className="flex gap-2 text-lg py-5 items-center justify-center">
-                    <Loader2 size={50} className="animate-spin" />
-                    Loading Jobs...
-                </div>
-            )}
-            {data !== null && <DataTable columns={columns} data={data!} />}
-            {data === null && (
+            <DataTable columns={columns} data={data} />
+            {data?.length === 0 && (
                 <div className="text-red-900 text-xl">No jobs found</div>
             )}
         </div>

@@ -24,12 +24,10 @@ import { handleError } from '@/lib/handleError';
 import { api } from '../../../../../convex/_generated/api';
 import { useMutation } from 'convex/react';
 import { Progress } from '@/components/ui/progress';
-import { useStableQuery } from '@/hooks/useStableQuery';
 import { useQuery } from '@tanstack/react-query';
 import { convexQuery } from '@convex-dev/react-query';
 
 function AddNewJob() {
-    // const categories = useStableQuery(api.categories.getAllCategories);
     const { data, isPending, error } = useQuery(
         convexQuery(api.categories.getAllCategories, {})
     );
@@ -58,22 +56,40 @@ function AddNewJob() {
         <RecruiterAddJobForm3 {...form} />,
     ]);
 
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading Categories...
+            </div>
+        );
+    }
+
+    if (!data) {
+        console.log('error', error);
+        return (
+            <div className="flex py-10 items-center justify-center text-red-900 text-center">
+                No category available
+            </div>
+        );
+    }
+
     async function onSubmit(data: any) {
         console.log(data);
 
         try {
             const createdJob = await createJob({ ...data });
-            if (createdJob !== null) {
+            if (createdJob.success === true) {
                 toast({
                     variant: 'success',
-                    title: 'Job created successfully',
-                    description: `${new Date().toUTCString()}`,
+                    title: 'Create Job',
+                    description: createdJob.message,
                 });
                 form.reset();
                 return router.push('/dashboard');
             }
             return form.setError('root', {
-                message: 'Error when creating job.',
+                message: createdJob.message,
             });
         } catch (error) {
             handleError(error);

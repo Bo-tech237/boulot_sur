@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { useStableQuery } from '@/hooks/useStableQuery';
 import { FileStack, Loader2 } from 'lucide-react';
 import { api } from '../../../../convex/_generated/api';
 import { useQuery } from '@tanstack/react-query';
@@ -13,15 +12,23 @@ export default function AllRecruiters() {
         convexQuery(api.recruiters.getAllRecruiters, {})
     );
 
-    // const recruitersWithUsers = useStableQuery(api.recruiters.getAllRecruiters);
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading Recruiters...
+            </div>
+        );
+    }
 
-    // if (recruitersWithUsers === undefined) {
-    //     return (
-    //         <div className="flex py-5 items-center justify-center">
-    //             Loading Recruiters...
-    //         </div>
-    //     );
-    // }
+    if (!data) {
+        console.log('error', error);
+        return (
+            <div className="flex py-10 items-center justify-center text-red-900 text-center">
+                No recruiter available
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -38,51 +45,38 @@ export default function AllRecruiters() {
                 </div>
 
                 <div className="flex flex-col gap-8 mt-8">
-                    {isPending && (
-                        <div className="flex gap-2 text-lg py-5 items-center justify-center">
-                            <Loader2 size={50} className="animate-spin" />
-                            Loading Recruiters...
-                        </div>
-                    )}
-
-                    {data !== null &&
-                        data?.map((recruiterWithUser) => (
-                            <div
-                                key={recruiterWithUser.recruiter._id}
-                                className="transition-all duration-500 ease-in-out hover:-translate-y-2"
+                    {data?.map((recruiterWithUser) => (
+                        <div
+                            key={recruiterWithUser.recruiter._id}
+                            className="transition-all duration-500 ease-in-out hover:-translate-y-2"
+                        >
+                            <Link
+                                href={`/recruiter/${recruiterWithUser.recruiter.userId}`}
                             >
-                                <Link
-                                    href={`/recruiter/${recruiterWithUser.recruiter.userId}`}
-                                >
-                                    <Card className="">
-                                        <CardHeader>
-                                            <CardTitle className="flex items-center justify-center h-16 w-16 rounded-lg text-center leading-[4.4] mx-auto bg-red-950">
-                                                <FileStack className="text-zinc-300" />
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="flex flex-col items-center">
-                                            <h5 className="text-xl font-bold">
-                                                Name:{' '}
-                                                {recruiterWithUser?.user?.name}
-                                            </h5>
+                                <Card className="">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center justify-center h-16 w-16 rounded-lg text-center leading-[4.4] mx-auto bg-red-950">
+                                            <FileStack className="text-zinc-300" />
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-col items-center">
+                                        <h5 className="text-xl font-bold">
+                                            Name:{' '}
+                                            {recruiterWithUser?.user?.name}
+                                        </h5>
 
-                                            <p className="mt-1 font-medium">
-                                                Country:{' '}
-                                                {
-                                                    recruiterWithUser.recruiter
-                                                        .country
-                                                }
-                                            </p>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
-                            </div>
-                        ))}
-                    {data?.length === 0 && (
-                        <div className="text-red-900 text-center text-2xl">
-                            No recruiter availble
+                                        <p className="mt-1 font-medium">
+                                            Country:{' '}
+                                            {
+                                                recruiterWithUser.recruiter
+                                                    .country
+                                            }
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
                         </div>
-                    )}
+                    ))}
                 </div>
             </div>
         </div>

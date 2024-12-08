@@ -2,8 +2,9 @@ import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
 import { getOneFrom, getManyFrom } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
-import { auth } from './auth';
-import { api, internal } from './_generated/api';
+import { api } from './_generated/api';
+import { hasPermission } from './lib/permissions';
+import { getAuthUserId } from '@convex-dev/auth/server';
 
 export const getAllApplicants = query({
     args: {},
@@ -20,7 +21,7 @@ export const getAllApplicants = query({
 export const getApplicant = query({
     args: {},
     handler: async (ctx) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) return;
 
@@ -33,8 +34,13 @@ export const getApplicant = query({
             userId,
             'userId'
         );
-
-        const fileUrl = await ctx.storage.getUrl(applicant?.fileId!);
+        if (!applicant || !applicant.fileId) {
+            return {
+                success: false,
+                message: 'No applicant found',
+            };
+        }
+        const fileUrl = await ctx.storage.getUrl(applicant?.fileId);
 
         return { ...user, ...applicant, fileUrl };
     },
@@ -79,10 +85,9 @@ export const createApplicant = mutation({
                 id: v.string(),
             })
         ),
-        fileId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -90,10 +95,10 @@ export const createApplicant = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'user') {
+        if (!user || !hasPermission(user, 'applicants', 'create')) {
             return {
                 success: false,
-                message: 'You must be a user',
+                message: 'Insufficient permissions',
             };
         }
 
@@ -101,7 +106,6 @@ export const createApplicant = mutation({
             userId: userId,
             education: args.education,
             skills: args.skills,
-            fileId: args.fileId,
             rating: 0,
         });
 
@@ -114,7 +118,7 @@ export const createApplicant = mutation({
             name: user?.name!,
         });
 
-        await ctx.db.patch(userId, { role: 'applicant' });
+        await ctx.db.patch(userId, { roles: ['user', 'applicant'] });
 
         return {
             success: true,
@@ -128,10 +132,19 @@ export const updateCV = mutation({
         fileId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
+        }
+
+        const user = await ctx.db.get(userId);
+
+        if (!user || !hasPermission(user, 'applicants', 'update')) {
+            return {
+                success: false,
+                message: 'Insufficient permissions',
+            };
         }
 
         const applicant = await ctx.db
@@ -161,7 +174,7 @@ export const addFileId = mutation({
         fileId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -203,7 +216,7 @@ export const updateApplicant = mutation({
         ),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -211,7 +224,7 @@ export const updateApplicant = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'applicant') {
+        if (!user || !hasPermission(user, 'applicants', 'update')) {
             return { success: false, message: 'You must be an applicant' };
         }
 
@@ -231,7 +244,7 @@ export const updateApplicant = mutation({
 export const deleteApplicant = mutation({
     args: { applicantId: v.id('users') },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -239,10 +252,10 @@ export const deleteApplicant = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'applicant') {
+        if (!user || !hasPermission(user, 'applicants', 'delete')) {
             return {
                 success: false,
-                message: 'You have no permissions to delete a applicant',
+                message: 'You have no permissions to delete an applicant',
             };
         }
 
@@ -257,8 +270,9 @@ export const deleteApplicant = mutation({
         // Check any active application
         const acceptedApplications = await ctx.db
             .query('applications')
-            .withIndex('byApplicantId', (q) => q.eq('applicantId', user?._id!))
-            .filter((q) => q.eq(q.field('status'), 'accepted'))
+            .withIndex('byApplicantId_Status', (q) =>
+                q.eq('applicantId', user?._id).eq('status', 'accepted')
+            )
             .collect();
 
         if (acceptedApplications.length > 0) {

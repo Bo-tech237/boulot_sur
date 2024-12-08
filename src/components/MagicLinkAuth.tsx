@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import { toast } from './ui/use-toast';
 import { magicLinkAuth } from '@/actions/magicLinkAuth';
 import { magicLinkSchema, magicLinkTypes } from '@/lib/magicLinkSchema';
 import { useAuthActions } from '@convex-dev/auth/react';

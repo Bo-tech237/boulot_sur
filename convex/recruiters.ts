@@ -9,6 +9,8 @@ import {
 } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
 import { auth } from './auth';
+import { getAuthUserId } from '@convex-dev/auth/server';
+import { hasPermission } from './lib/permissions';
 
 export const getAllRecruiters = query({
     args: {},
@@ -52,11 +54,13 @@ export const getRecruiterById = query({
 export const getRecruiter = query({
     args: {},
     handler: async (ctx) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) return;
 
         const user = await ctx.db.get(userId);
+
+        if (!user) return;
 
         const recruiter = await getOneFrom(
             ctx.db,
@@ -65,6 +69,9 @@ export const getRecruiter = query({
             userId,
             'userId'
         );
+
+        if (!recruiter) return;
+
         return { ...user, ...recruiter };
     },
 });
@@ -91,15 +98,16 @@ export const createRecruiter = mutation({
         description: v.string(),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
         }
 
         const user = await ctx.db.get(userId);
+        console.log('recruiter', hasPermission(user!, 'recruiters', 'create'));
 
-        if (user?.role !== 'user') {
+        if (!user || !hasPermission(user, 'recruiters', 'create')) {
             return {
                 success: false,
                 message: 'You must be a user',
@@ -124,7 +132,7 @@ export const createRecruiter = mutation({
             name: user?.name!,
         });
 
-        await ctx.db.patch(userId, { role: 'recruiter' });
+        await ctx.db.patch(userId, { roles: ['user', 'recruiter'] });
 
         return {
             success: true,
@@ -142,7 +150,7 @@ export const updateRecruiter = mutation({
         description: v.string(),
     },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -150,7 +158,7 @@ export const updateRecruiter = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'recruiter') {
+        if (!user || !hasPermission(user, 'recruiters', 'update')) {
             return { success: false, message: 'You must be a recruiter' };
         }
 
@@ -172,7 +180,7 @@ export const updateRecruiter = mutation({
 export const deleteRecruiter = mutation({
     args: { recruiterId: v.id('users') },
     handler: async (ctx, args) => {
-        const userId = await auth.getUserId(ctx);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             throw new Error('You need to be logged in');
@@ -180,7 +188,7 @@ export const deleteRecruiter = mutation({
 
         const user = await ctx.db.get(userId);
 
-        if (user?.role !== 'recruiter') {
+        if (!user || !hasPermission(user, 'recruiters', 'delete')) {
             return {
                 success: false,
                 message: 'You have no permissions to delete a recruiter',

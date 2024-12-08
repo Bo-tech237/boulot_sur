@@ -12,7 +12,6 @@ import Autoplay from 'embla-carousel-autoplay';
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Loader2 } from 'lucide-react';
-import { useStableQuery } from '@/hooks/useStableQuery';
 import { api } from '../../../convex/_generated/api';
 import { ShowRating } from '../ui/showRating';
 import { useQuery } from '@tanstack/react-query';
@@ -23,19 +22,27 @@ export default function Testimonials() {
         convexQuery(api.comments.getBestReviews, {})
     );
 
-    // const bestReviews = useStableQuery(api.comments.getBestReviews);
-
     const plugin = React.useRef(
         Autoplay({ delay: 2000, stopOnInteraction: false })
     );
 
-    // if (bestReviews === undefined) {
-    //     return (
-    //         <div className="flex py-10 items-center justify-center">
-    //             Loading Reviews...
-    //         </div>
-    //     );
-    // }
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading reviews...
+            </div>
+        );
+    }
+
+    if (!data) {
+        console.log('error', error);
+        return (
+            <div className="flex py-10 items-center justify-center dark:text-white text-red-900 text-center">
+                No review available right now
+            </div>
+        );
+    }
 
     console.log('bestReviews:', data);
 
@@ -67,12 +74,6 @@ export default function Testimonials() {
                 </div>
 
                 <div>
-                    {isPending && (
-                        <div className="flex gap-2 text-lg py-5 items-center justify-center">
-                            <Loader2 size={50} className="animate-spin" />
-                            Loading Reviews...
-                        </div>
-                    )}
                     <Carousel
                         opts={{
                             align: 'center',
@@ -84,47 +85,43 @@ export default function Testimonials() {
                         className="w-full"
                     >
                         <CarouselContent>
-                            {data &&
-                                data?.map((review) => (
-                                    <CarouselItem
-                                        key={review.rating?._id}
-                                        className="md:basis-1/2 lg:basis-1/3"
-                                    >
-                                        <div className="p-1">
-                                            <Card>
-                                                <CardContent className="flex flex-col aspect-square items-center justify-center p-6">
-                                                    <span className="text-3xl font-semibold">
-                                                        <ShowRating
-                                                            userRating={
-                                                                review.rating
-                                                                    ?.ratings
-                                                            }
-                                                        />
-                                                    </span>
-                                                    <div className="mt-2">
-                                                        <p className="mt-2 leading-relaxed text-gray-700">
-                                                            {
-                                                                review.comment
-                                                                    ?.text
-                                                            }
-                                                        </p>
-                                                    </div>
-                                                </CardContent>
-                                                <CardFooter>
-                                                    &mdash; {review.user?.name}
-                                                </CardFooter>
-                                            </Card>
-                                        </div>
-                                    </CarouselItem>
-                                ))}
+                            {data?.map((review) => (
+                                <CarouselItem
+                                    key={review.rating?._id}
+                                    className="md:basis-1/2 lg:basis-1/3"
+                                >
+                                    <div className="p-1">
+                                        <Card>
+                                            <CardContent className="flex flex-col aspect-square items-center justify-center p-6">
+                                                <span className="text-3xl font-semibold">
+                                                    <ShowRating
+                                                        userRating={
+                                                            review.rating
+                                                                ?.ratings
+                                                        }
+                                                    />
+                                                </span>
+                                                <div className="mt-2">
+                                                    <p className="mt-2 leading-relaxed text-gray-700">
+                                                        {review.comment?.text}
+                                                    </p>
+                                                </div>
+                                            </CardContent>
+                                            <CardFooter>
+                                                &mdash; {review.user?.name}
+                                            </CardFooter>
+                                        </Card>
+                                    </div>
+                                </CarouselItem>
+                            ))}
                         </CarouselContent>
                     </Carousel>
-                    {data?.length === 0 && (
-                        <div className="text-red-600 text-center text-2xl mt-10">
-                            No reviews for now
-                        </div>
-                    )}
                 </div>
+                {data.length === 0 && (
+                    <div className="flex py-10 items-center justify-center dark:text-white text-red-900 text-center font-bold text-2xl">
+                        No review available right now
+                    </div>
+                )}
             </div>
         </section>
     );

@@ -13,12 +13,13 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import { toast } from './ui/use-toast';
 import { contactSchema, contactTypes } from '@/lib/contactSchema';
 import { contactAdmin } from '@/actions/contactAdmin';
 import { Textarea } from './ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 function Contact() {
+    const { toast } = useToast();
     const form = useForm<contactTypes>({
         resolver: zodResolver(contactSchema),
     });

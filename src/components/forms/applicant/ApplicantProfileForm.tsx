@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import {
     FormControl,
     FormField,
@@ -8,10 +7,11 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Tag, TagInput } from '@/components/tag/tag-input';
+import { Tag, TagInput } from 'emblor';
 import { UseFormReturn } from 'react-hook-form';
 import { FormWrapper } from '@/components/forms/formWrapper';
 import { Input } from '@/components/ui/input';
+import { useState } from 'react';
 
 function ApplicantProfileForm(
     form: UseFormReturn<
@@ -31,7 +31,9 @@ function ApplicantProfileForm(
         undefined
     >
 ) {
-    const [tags, setTags] = React.useState<Tag[]>([]);
+    const [tags, setTags] = useState<Tag[]>([]);
+    const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
+
     const { setValue } = form;
 
     const fileRef = form.register('fileId');
@@ -61,15 +63,9 @@ function ApplicantProfileForm(
                             <FormControl>
                                 <TagInput
                                     {...field}
-                                    placeholder="Enter a skill and press enter"
-                                    tags={
-                                        field.value?.length > 0
-                                            ? field.value
-                                            : tags
-                                    }
-                                    className=""
-                                    inputFieldPostion="top"
-                                    draggable={true}
+                                    placeholder="Enter a skill"
+                                    tags={tags}
+                                    className="sm:min-w-[450px]"
                                     setTags={(newTags) => {
                                         setTags(newTags);
                                         setValue(
@@ -77,6 +73,10 @@ function ApplicantProfileForm(
                                             newTags as [Tag, ...Tag[]]
                                         );
                                     }}
+                                    activeTagIndex={activeTagIndex}
+                                    setActiveTagIndex={setActiveTagIndex}
+                                    clearAll={true}
+                                    addOnPaste={true}
                                 />
                             </FormControl>
                             <FormMessage />

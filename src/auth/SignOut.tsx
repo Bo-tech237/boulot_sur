@@ -10,7 +10,7 @@ export function SignOut() {
     return (
         <button
             className="flex w-full items-center"
-            onClick={() => void signOut()}
+            onClick={() => void signOut().then(() => router.refresh())}
         >
             <LogOut className="mr-2 h-4 w-4" /> Sign Out
         </button>

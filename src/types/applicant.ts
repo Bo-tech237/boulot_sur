@@ -17,7 +17,7 @@ export type ApplicantDataType = {
     skills?: Skill[];
     userId?: Id<'users'>;
     fileUrl: string | null;
-};
+} | null;
 
 export interface Education {
     endYear: string;

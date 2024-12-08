@@ -10,30 +10,22 @@ import { useRecruiterAddStepForm } from '@/hooks/useRecruiterAddStepForm';
 import RecruiterAddJobForm1 from './RecruiterAddJobForm1';
 import RecruiterAddJobForm2 from './RecruiterAddJobForm2';
 import RecruiterAddJobForm3 from './RecruiterAddJobForm3';
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/components/ui/use-toast';
 import { handleError } from '@/lib/handleError';
 import { api } from '../../../../../convex/_generated/api';
 import { useMutation } from 'convex/react';
 import { Progress } from '@/components/ui/progress';
-import { useStableQuery } from '@/hooks/useStableQuery';
 import { useQuery } from '@tanstack/react-query';
 import { convexQuery } from '@convex-dev/react-query';
+import { useToast } from '@/hooks/use-toast';
 
 type UpdateJobprops = {
     job: jobApiTypes;
 };
 
 function UpdateJob({ job }: UpdateJobprops) {
-    // const categories = useStableQuery(api.categories.getAllCategories);
     const { data, isPending, error } = useQuery(
         convexQuery(api.categories.getAllCategories, {})
     );
@@ -83,24 +75,25 @@ function UpdateJob({ job }: UpdateJobprops) {
                 jobId: job?._id,
                 ...data,
             });
-            if (updatedJob.success === true) {
-                toast({
-                    variant: 'success',
-                    title: updatedJob.message,
-                    description: `${new Date().toUTCString()}`,
+            if (updatedJob.success === false) {
+                return form.setError('root', {
+                    message: updatedJob.message,
                 });
-                return router.push('/dashboard/recruiter/jobs');
             }
-            return form.setError('root', {
-                message: 'Error when updating job.',
+
+            toast({
+                variant: 'success',
+                title: 'Updated Job',
+                description: updatedJob.message,
             });
+            return router.push('/dashboard/recruiter/jobs');
         } catch (error) {
             handleError(error);
         } finally {
             return;
         }
     }
-
+    console.log('error', error);
     return (
         <div>
             <Card>
@@ -144,7 +137,7 @@ function UpdateJob({ job }: UpdateJobprops) {
                                         type="submit"
                                         disabled={form.formState.isSubmitting}
                                     >
-                                        <span className="flex items-center justify-center gap-1">
+                                        <span className="flex gap-1">
                                             {form.formState.isSubmitting && (
                                                 <Loader2
                                                     size={16}

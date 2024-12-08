@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ShowRating } from '@/components/ui/showRating';
 import { RecruiterDataType } from '@/types/recruiters';
-import { Badge } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -11,6 +10,7 @@ type Props = {
 };
 
 export default function LeftContent({ recruiter }: Props) {
+    if (!recruiter) return;
     return (
         <div className="col-span-12 lg:col-span-4">
             <div className="border rounded">

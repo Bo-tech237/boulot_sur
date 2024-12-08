@@ -1,6 +1,6 @@
 'use client';
 
-import { Lock } from 'lucide-react';
+import { Home, Loader2, Lock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from './ui/button';
@@ -14,16 +14,35 @@ import {
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { SignOut } from '@/auth/SignOut';
-import { useStableQuery } from '@/hooks/useStableQuery';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
 import { api } from '../../convex/_generated/api';
 
 export default function UserButton() {
-    const user = useStableQuery(api.users.getUser);
+    const {
+        data: user,
+        isPending,
+        error,
+    } = useQuery(convexQuery(api.users.getUser, {}));
 
-    if (user === undefined) {
-        return <div>Profile...</div>;
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Profile...
+            </div>
+        );
     }
-    console.log('testUser', user);
+
+    if (!user) {
+        console.log('error', error);
+        return (
+            <div className="flex py-10 items-center justify-center text-red-900 text-center">
+                No user available
+            </div>
+        );
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -42,19 +61,26 @@ export default function UserButton() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
-                        Role: {user?.role || 'User'}
+                        Role: {user?.roles?.join('-') || 'User'}
                     </DropdownMenuItem>
 
-                    {user?.role === 'user' ? (
+                    <DropdownMenuItem asChild>
+                        <Link href="/" className="cursor-pointer">
+                            <Home className="mr-2 h-4 w-4" />
+                            Home
+                        </Link>
+                    </DropdownMenuItem>
+
+                    {user?.roles?.length === 1 ? (
                         <DropdownMenuItem asChild>
-                            <Link href="/register">
+                            <Link href="/register" className="cursor-pointer">
                                 <Lock className="mr-2 h-4 w-4" />
                                 Register
                             </Link>
                         </DropdownMenuItem>
                     ) : (
                         <DropdownMenuItem asChild>
-                            <Link href="/dashboard">
+                            <Link href="/dashboard" className="cursor-pointer">
                                 <Lock className="mr-2 h-4 w-4" />
                                 Dashboard
                             </Link>

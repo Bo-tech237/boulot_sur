@@ -5,19 +5,17 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogClose,
     DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from './ui/dialog';
-import { useRouter } from 'next/navigation';
-import { toast } from './ui/use-toast';
 import { handleError } from '@/lib/handleError';
 import { ReactNode, useState, useTransition } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
+import { useToast } from '@/hooks/use-toast';
 
 type Props = {
     id: Id<'applications'>;
@@ -25,12 +23,13 @@ type Props = {
 };
 
 function DeleteApplicationsDialog({ id, children }: Props) {
-    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
     const deleteApplication = useMutation(api.applications.deleteApplication);
 
     const [isPending, startTransition] = useTransition();
+
+    const { toast } = useToast();
 
     async function handleDelete() {
         try {
@@ -38,28 +37,24 @@ function DeleteApplicationsDialog({ id, children }: Props) {
                 applicationId: id,
             });
 
-            if (deletedApplication.success === false) {
+            if (deletedApplication?.success === false) {
                 toast({
                     variant: 'destructive',
-                    title: deletedApplication.message,
-                    description: `${new Date().toUTCString()}`,
+                    title: 'Delete Application',
+                    description: deletedApplication.message,
                 });
-
+                console.log('DeleteDialog', deletedApplication);
                 setIsOpen(false);
                 return;
             }
 
-            console.log('DeleteDialog', deletedApplication);
-
             toast({
                 variant: 'success',
-                title: deletedApplication.message,
-                description: `${new Date().toUTCString()}`,
+                title: 'Delete Application',
+                description: deletedApplication.message,
             });
 
-            setIsOpen(false);
-
-            return router.push('/dashboard/applicant/applications');
+            return setIsOpen(false);
         } catch (error) {
             handleError(error);
         }
@@ -80,20 +75,22 @@ function DeleteApplicationsDialog({ id, children }: Props) {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="">
-                        <div className="w-full my-4 flex items-center justify-between gap-3">
-                            <DialogClose asChild>
-                                <Button variant="secondary" type="button">
-                                    Close
-                                </Button>
-                            </DialogClose>
+                        <div className="w-full my-4 flex gap-2">
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => setIsOpen(false)}
+                                className="flex-1"
+                            >
+                                Close
+                            </Button>
 
                             <Button
                                 disabled={isPending}
-                                className="flex gap-2"
+                                className="flex-1 gap-2"
                                 type="button"
                                 onClick={() => startTransition(handleDelete)}
                                 variant="destructive"
-                                size="sm"
                             >
                                 {isPending && (
                                     <Loader2

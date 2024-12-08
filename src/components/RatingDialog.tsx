@@ -1,12 +1,9 @@
 'use client';
 
-import { Button } from './ui/button';
 import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogClose,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -49,14 +46,6 @@ function RatingDialog({ application, children }: Props) {
                         application={application}
                         onRating={() => setIsOpen(false)}
                     />
-
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline" type="button">
-                                Close
-                            </Button>
-                        </DialogClose>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>

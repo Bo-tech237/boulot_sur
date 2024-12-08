@@ -1,8 +1,8 @@
 'use client';
+
 import RegisterRecruiter from '@/components/RegisterRecruiter';
 import { api } from '../../../../../../convex/_generated/api';
 import { Id } from '../../../../../../convex/_generated/dataModel';
-import { useStableQuery } from '@/hooks/useStableQuery';
 import { useQuery } from '@tanstack/react-query';
 import { convexQuery } from '@convex-dev/react-query';
 import { Loader2 } from 'lucide-react';
@@ -16,32 +16,27 @@ function UpdateProfile({ id }: Props) {
         })
     );
 
-    // const recruiter = useStableQuery(
-    //     api.recruiters.getRecruiterOnlyById,
-    //     id
-    //         ? {
-    //               userId: id as Id<'users'>,
-    //           }
-    //         : 'skip'
-    // );
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading Recruiter...
+            </div>
+        );
+    }
 
-    // if (recruiter === undefined) {
-    //     return (
-    //         <div className="flex h-screen items-center justify-center">
-    //             Loading Recruiter...
-    //         </div>
-    //     );
-    // }
+    if (!data) {
+        console.log('error:', error);
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                Data not available
+            </div>
+        );
+    }
 
     return (
         <div>
-            {isPending && (
-                <div className="flex gap-2 text-lg py-5 items-center justify-center">
-                    <Loader2 size={50} className="animate-spin" />
-                    Loading Recruiter...
-                </div>
-            )}
-            {data && <RegisterRecruiter recruiter={data!} />}
+            <RegisterRecruiter recruiter={data} />
         </div>
     );
 }

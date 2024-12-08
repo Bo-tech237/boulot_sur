@@ -39,9 +39,6 @@ function JobApplyDialog({ jobId }: { jobId: Id<'jobs'> }) {
     const router = useRouter();
     const form = useForm<applyJob>({
         resolver: zodResolver(applyJobSchema),
-        defaultValues: {
-            sop: '',
-        },
     });
 
     async function onSubmit(data: applyJob) {
@@ -52,14 +49,14 @@ function JobApplyDialog({ jobId }: { jobId: Id<'jobs'> }) {
 
             console.log('response', result);
             if (result?.success === false) {
-                form.reset();
+                form.reset({ sop: '' });
                 return form.setError('root', { message: result.message });
             }
 
             toast({
                 variant: 'success',
-                title: 'Job applied successfully.',
-                description: `${new Date()}`,
+                title: 'Apply For A Job',
+                description: result.message,
             });
             form.reset();
             setIsOpen(false);
@@ -112,6 +109,7 @@ function JobApplyDialog({ jobId }: { jobId: Id<'jobs'> }) {
                                     <Button
                                         type="submit"
                                         disabled={form.formState.isSubmitting}
+                                        className="w-full"
                                     >
                                         <span className="flex items-center justify-center gap-1">
                                             {form.formState.isSubmitting && (

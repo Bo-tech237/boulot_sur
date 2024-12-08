@@ -9,11 +9,11 @@ export type RecruiterDataType = {
     email?: string;
     image?: string;
     name?: string;
-    phone?: number | string;
+    phone?: number;
     emailVerificationTime?: number;
     phoneVerificationTime?: number;
     isAnonymous?: boolean;
     rating?: number;
     role?: string;
     userId?: Id<'users'>;
-};
+} | null;

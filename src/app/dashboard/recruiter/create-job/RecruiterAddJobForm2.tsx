@@ -56,6 +56,14 @@ function RecruiterAddJobForm2({ categories, form, isPending }: Props) {
         );
     }
 
+    if (!categories) {
+        return (
+            <div className="flex py-10 items-center justify-center text-red-900 text-center">
+                No category available
+            </div>
+        );
+    }
+
     return (
         <div>
             <FormWrapper title="User Details">

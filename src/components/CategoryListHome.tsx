@@ -7,21 +7,30 @@ import { ArrowRight, FileStack, Loader2 } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useQuery } from '@tanstack/react-query';
 import { convexQuery } from '@convex-dev/react-query';
-import { useStableQuery } from '@/hooks/useStableQuery';
 
 export default function CategoryListHome() {
     const { data, isPending, error } = useQuery(
         convexQuery(api.categories.getHomeCategories, {})
     );
-    // const categoriesResults = useStableQuery(api.categories.getHomeCategories);
 
-    // if (categoriesResults === undefined) {
-    //     return (
-    //         <div className="flex py-5 items-center justify-center">
-    //             Loading Categories...
-    //         </div>
-    //     );
-    // }
+    if (isPending) {
+        return (
+            <div className="flex gap-2 text-lg py-5 items-center justify-center">
+                <Loader2 size={50} className="animate-spin" />
+                Loading Categories...
+            </div>
+        );
+    }
+
+    if (!data) {
+        console.log('error', error);
+        return (
+            <div className="flex py-10 items-center justify-center text-red-900 text-center">
+                No job available
+            </div>
+        );
+    }
+
     console.log('test', data);
     return (
         <div>
@@ -37,44 +46,37 @@ export default function CategoryListHome() {
                     </p>
                 </div>
 
-                {isPending && (
-                    <div className="flex gap-2 text-lg py-5 items-center justify-center">
-                        <Loader2 size={50} className="animate-spin" />
-                        Loading Categories...
-                    </div>
-                )}
                 <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {data !== null &&
-                        data?.map((categoryResult) => (
-                            <div
-                                key={categoryResult.category._id}
-                                className="transition-all duration-500 ease-in-out hover:-translate-y-2"
+                    {data?.map((categoryResult) => (
+                        <div
+                            key={categoryResult.category._id}
+                            className="transition-all duration-500 ease-in-out hover:-translate-y-2"
+                        >
+                            <Link
+                                href={`/categories/${categoryResult.category._id}`}
                             >
-                                <Link
-                                    href={`/categories/${categoryResult.category._id}`}
-                                >
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="flex items-center justify-center h-16 w-16 rounded-lg text-center leading-[4.4] mx-auto bg-red-950">
-                                                <FileStack className="text-zinc-300" />
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="flex flex-col items-center">
-                                            <h5 className="text-xl font-bold">
-                                                {categoryResult.category.name}
-                                            </h5>
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center justify-center h-16 w-16 rounded-lg text-center leading-[4.4] mx-auto bg-red-950">
+                                            <FileStack className="text-zinc-300" />
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-col items-center">
+                                        <h5 className="text-xl font-bold">
+                                            {categoryResult.category.name}
+                                        </h5>
 
-                                            <p className="mt-1 font-medium">
-                                                {categoryResult.totalJobs}{' '}
-                                                {categoryResult.totalJobs > 1
-                                                    ? 'Jobs'
-                                                    : 'Job'}
-                                            </p>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
-                            </div>
-                        ))}
+                                        <p className="mt-1 font-medium">
+                                            {categoryResult.totalJobs}{' '}
+                                            {categoryResult.totalJobs > 1
+                                                ? 'Jobs'
+                                                : 'Job'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        </div>
+                    ))}
                 </div>
 
                 <div className="mt-12 text-center transition-all duration-500 ease-in-out hover:-translate-y-2">

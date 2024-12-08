@@ -19,14 +19,16 @@ const queryClient = new QueryClient({
 });
 convexQueryClient.connect(queryClient);
 
-export default function TanStackProvider({
+export default function ConvexClientProvider({
     children,
 }: {
     children: ReactNode;
 }) {
     return (
-        <QueryClientProvider client={queryClient}>
-            {children}
-        </QueryClientProvider>
+        <ConvexAuthNextjsProvider client={convex}>
+            <QueryClientProvider client={queryClient}>
+                {children}
+            </QueryClientProvider>
+        </ConvexAuthNextjsProvider>
     );
 }

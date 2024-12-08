@@ -14,7 +14,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from './ui/use-toast';
 import { recruiterSchema, recruiterTypes } from '@/lib/recruiterSchema';
@@ -150,9 +150,15 @@ function RegisterRecruiter({ recruiter }: Props) {
                                         type="submit"
                                         disabled={form.formState.isSubmitting}
                                     >
-                                        {form.formState.isSubmitting
-                                            ? 'Submitting...'
-                                            : 'Submit'}
+                                        <span className="flex items-center justify-center gap-1">
+                                            {form.formState.isSubmitting && (
+                                                <Loader2
+                                                    size={16}
+                                                    className="animate-spin"
+                                                />
+                                            )}
+                                            Submit
+                                        </span>
                                     </Button>
                                 )}
                             </div>
