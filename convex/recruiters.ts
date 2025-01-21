@@ -8,7 +8,6 @@ import {
     getManyVia,
 } from 'convex-helpers/server/relationships';
 import { asyncMap } from 'convex-helpers';
-import { auth } from './auth';
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { hasPermission } from './lib/permissions';
 
@@ -183,10 +182,13 @@ export const deleteRecruiter = mutation({
         const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
-            throw new Error('You need to be logged in');
+            return {
+                success: false,
+                message: 'You need to be logged in.',
+            };
         }
 
-        const user = await ctx.db.get(userId);
+        const user = await ctx.db.get(args.recruiterId);
 
         if (!user || !hasPermission(user, 'recruiters', 'delete')) {
             return {

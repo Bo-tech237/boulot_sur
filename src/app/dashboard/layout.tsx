@@ -1,6 +1,12 @@
 import { Metadata } from 'next';
 import DashboardNav from '@/components/DashboardNav';
-import DashboardPermissions from '@/auth/DashboardPermissions';
+import {
+    SidebarInset,
+    SidebarProvider,
+    SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { cookies } from 'next/headers';
+import AppSidebar from '@/components/AppSidebar';
 
 export const metadata: Metadata = {
     title: {
@@ -17,14 +23,23 @@ interface SettingsLayoutProps {
 export default async function SettingsLayout({
     children,
 }: SettingsLayoutProps) {
+    const cookieStore = await cookies();
+    const defaultOpen = cookieStore.get('sidebar:state')?.value === 'true';
+    console.log('cookies:', cookieStore, 'open:', defaultOpen);
+
     return (
         <>
-            <div className="flex min-h-screen w-full flex-col">
-                <DashboardNav />
-                <main className="container flex flex-1 flex-col gap-4 py-4 md:gap-8">
-                    {children}
-                </main>
-            </div>
+            <SidebarProvider defaultOpen={defaultOpen}>
+                <AppSidebar variant="inset" />
+
+                <SidebarInset>
+                    <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                        <SidebarTrigger />
+
+                        {children}
+                    </main>
+                </SidebarInset>
+            </SidebarProvider>
         </>
     );
 }

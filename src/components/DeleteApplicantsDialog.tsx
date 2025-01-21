@@ -11,13 +11,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from './ui/dialog';
-import { toast } from './ui/use-toast';
 import { handleError } from '@/lib/handleError';
 import { ReactNode, useState, useTransition } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
 import { useAuthActions } from '@convex-dev/auth/react';
+import { useToast } from '@/hooks/use-toast';
 
 type Props = {
     id: Id<'users'>;
@@ -28,6 +28,7 @@ function DeleteApplicantsDialog({ id, children }: Props) {
     const { signOut } = useAuthActions();
     const deleteApplicant = useMutation(api.applicants.deleteApplicant);
     const [isOpen, setIsOpen] = useState(false);
+    const { toast } = useToast();
 
     const [isPending, startTransition] = useTransition();
 
@@ -37,14 +38,25 @@ function DeleteApplicantsDialog({ id, children }: Props) {
 
             console.log('DeleteApplicant', deletedApplicant);
 
-            signOut();
+            if (deletedApplicant.success === false) {
+                setIsOpen(false);
+                toast({
+                    variant: 'destructive',
+                    title: deletedApplicant.message,
+                    description: `${new Date().toLocaleDateString()}`,
+                });
+                return;
+            }
+
+            setIsOpen(false);
             toast({
                 variant: 'success',
                 title: deletedApplicant.message,
-                description: `${new Date().toUTCString()}`,
+                description: `${new Date().toLocaleDateString()}`,
             });
+            signOut();
 
-            setIsOpen(false);
+            return;
         } catch (error) {
             handleError(error);
         }

@@ -35,10 +35,7 @@ export const getApplicant = query({
             'userId'
         );
         if (!applicant || !applicant.fileId) {
-            return {
-                success: false,
-                message: 'No applicant found',
-            };
+            return;
         }
         const fileUrl = await ctx.storage.getUrl(applicant?.fileId);
 
@@ -247,10 +244,13 @@ export const deleteApplicant = mutation({
         const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
-            throw new Error('You need to be logged in');
+            return {
+                success: false,
+                message: 'You need to be logged in.',
+            };
         }
 
-        const user = await ctx.db.get(userId);
+        const user = await ctx.db.get(args.applicantId);
 
         if (!user || !hasPermission(user, 'applicants', 'delete')) {
             return {

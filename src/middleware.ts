@@ -14,6 +14,7 @@ const isDashboardPage = createRouteMatcher(['/dashboard']);
 const isProtectedRoute = createRouteMatcher(['/register', '/dashboard(.*)']);
 
 export default convexAuthNextjsMiddleware(async (request) => {
+    const isAuthenticated = await isAuthenticatedNextjs();
     const user = await fetchQuery(
         api.users.getUser,
         {},
@@ -21,7 +22,7 @@ export default convexAuthNextjsMiddleware(async (request) => {
     );
 
     // 1. User not authenticated
-    if (!(await isAuthenticatedNextjs()) || user === null) {
+    if (!isAuthenticated || !user) {
         if (isProtectedRoute(request)) {
             return nextjsMiddlewareRedirect(request, '/login');
         }
@@ -32,7 +33,7 @@ export default convexAuthNextjsMiddleware(async (request) => {
     const hasUserRole = userRoles.length === 1;
     const hasAdditionalRoles = userRoles.length > 1;
 
-    if (isLoginPage(request) && (await isAuthenticatedNextjs())) {
+    if (isLoginPage(request) && isAuthenticated) {
         return nextjsMiddlewareRedirect(request, '/register');
     }
 

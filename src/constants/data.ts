@@ -1,54 +1,139 @@
-export const recruiterNavItems = [
+import { SidebarNavItem } from '@/types/SidebarTypes';
+import {
+    LayoutDashboardIcon,
+    FolderPlus,
+    BookText,
+    BookType,
+    UserRound,
+} from 'lucide-react';
+
+export const recruiterNavItems: SidebarNavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
-        icon: 'dashboard',
+        icon: LayoutDashboardIcon,
         variant: 'default',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard',
+            },
+        ],
     },
     {
         title: 'Add Jobs',
-        href: '/dashboard/recruiter/create-job',
-        icon: 'profile',
+        icon: FolderPlus,
         variant: 'ghost',
+        items: [
+            {
+                title: 'Create',
+                href: '/dashboard/recruiter/create-job',
+            },
+        ],
     },
     {
         title: 'My Jobs',
-        href: '/dashboard/recruiter/jobs',
-        icon: 'profile',
+        icon: BookText,
         variant: 'ghost',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard/recruiter/jobs',
+            },
+        ],
     },
     {
         title: 'Applications',
-        href: '/dashboard/recruiter/applications',
-        icon: 'account',
+        icon: BookType,
         variant: 'ghost',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard/recruiter/applications',
+            },
+        ],
     },
     {
         title: 'Profile',
-        href: '/dashboard/recruiter/profile',
-        icon: 'profile',
+        icon: UserRound,
         variant: 'ghost',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard/recruiter/profile',
+            },
+        ],
     },
 ];
 
-export const applicantNavItems = [
+export const applicantNavItems: SidebarNavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
-        icon: 'dashboard',
+        icon: LayoutDashboardIcon,
         variant: 'default',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard',
+            },
+        ],
     },
     {
         title: 'Applications',
-        href: '/dashboard/applicant/applications',
-        icon: 'profile',
+        icon: BookType,
         variant: 'ghost',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard/applicant/applications',
+            },
+        ],
     },
     {
         title: 'Profile',
-        href: '/dashboard/applicant/profile',
-        icon: 'account',
+        icon: UserRound,
         variant: 'ghost',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard/applicant/profile',
+            },
+        ],
+    },
+];
+
+export const adminNavItems: SidebarNavItem[] = [
+    {
+        title: 'Dashboard',
+        icon: LayoutDashboardIcon,
+        variant: 'default',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard',
+            },
+        ],
+    },
+    {
+        title: 'Recruiters',
+        icon: BookType,
+        variant: 'ghost',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard/admin/recruiters',
+            },
+        ],
+    },
+    {
+        title: 'Applicants',
+        icon: UserRound,
+        variant: 'ghost',
+        items: [
+            {
+                title: 'View',
+                href: '/dashboard/admin/applicants',
+            },
+        ],
     },
 ];
 

@@ -1,7 +1,5 @@
-import { Id } from './_generated/dataModel';
-import { query, mutation, internalMutation } from './_generated/server';
+import { query, internalMutation } from './_generated/server';
 import { v } from 'convex/values';
-import { auth } from './auth';
 import { getAuthUserId } from '@convex-dev/auth/server';
 
 export const getUserById = query({
@@ -19,6 +17,43 @@ export const getUser = query({
             return null;
         }
         const user = await ctx.db.get(userId);
+        console.log('user:', user);
+        return user;
+    },
+});
+
+export const getRecruiterUsers = query({
+    args: {},
+    handler: async (ctx) => {
+        const userId = await getAuthUserId(ctx);
+        if (userId === null) {
+            return null;
+        }
+
+        const user = await ctx.db
+            .query('users')
+            .withIndex('byRoles', (q) => q.eq('roles', ['user', 'recruiter']))
+            .order('desc')
+            .collect();
+
+        console.log('user:', user);
+        return user;
+    },
+});
+
+export const getApplicantUsers = query({
+    args: {},
+    handler: async (ctx) => {
+        const userId = await getAuthUserId(ctx);
+        if (userId === null) {
+            return null;
+        }
+
+        const user = await ctx.db
+            .query('users')
+            .withIndex('byRoles', (q) => q.eq('roles', ['user', 'applicant']))
+            .order('desc')
+            .collect();
         console.log('user:', user);
         return user;
     },

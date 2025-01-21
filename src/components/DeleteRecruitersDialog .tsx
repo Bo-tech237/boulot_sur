@@ -42,15 +42,25 @@ function DeleteRecruitersDialog({ id, children }: Props) {
 
             console.log('DeleteRecruiters', deletedRecruiter);
 
-            signOut();
+            if (deletedRecruiter.success === false) {
+                setIsOpen(false);
+                toast({
+                    variant: 'destructive',
+                    title: deletedRecruiter.message,
+                    description: `${new Date().toLocaleDateString()}`,
+                });
+                return;
+            }
+
+            setIsOpen(false);
             toast({
                 variant: 'success',
                 title: deletedRecruiter.message,
-                description: `${new Date().toUTCString()}`,
+                description: `${new Date().toLocaleDateString()}`,
             });
-            setIsOpen(false);
+            signOut();
 
-            return router.push('/jobs');
+            return;
         } catch (error) {
             handleError(error);
         }

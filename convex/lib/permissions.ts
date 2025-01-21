@@ -104,7 +104,11 @@ type Role = 'admin' | 'recruiter' | 'applicant' | 'user';
 // Define permissions for different entities
 type Permissions = {
     users: {
-        dataType: Recruiter;
+        dataType: User;
+        action: 'view' | 'create' | 'update' | 'delete';
+    };
+    admin: {
+        dataType: User;
         action: 'view' | 'create' | 'update' | 'delete';
     };
     recruiters: {
@@ -178,6 +182,18 @@ const ROLES = {
         },
     },
     admin: {
+        recruiters: {
+            view: true,
+            create: false,
+            delete: true,
+            update: true,
+        },
+        applicants: {
+            view: true,
+            create: false,
+            delete: true,
+            update: true,
+        },
         comments: {
             view: true,
             create: true,
@@ -206,8 +222,14 @@ const ROLES = {
     recruiter: {
         recruiters: {
             view: true,
-            create: false,
+            create: true,
             delete: true,
+            update: true,
+        },
+        applicants: {
+            view: true,
+            create: false,
+            delete: false,
             update: true,
         },
         comments: {
@@ -238,7 +260,7 @@ const ROLES = {
     applicant: {
         applicants: {
             view: true,
-            create: false,
+            create: true,
             delete: true,
             update: true,
         },

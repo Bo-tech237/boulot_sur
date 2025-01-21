@@ -41,7 +41,7 @@ export default function ApplicantProfile() {
             <div>
                 <div className="flex flex-wrap gap-1 justify-between mb-5">
                     <DeleteApplicantsDialog id={data?.userId!}>
-                        <Button>Delete Profile</Button>
+                        <Button>Delete Account</Button>
                     </DeleteApplicantsDialog>
 
                     <Button asChild>

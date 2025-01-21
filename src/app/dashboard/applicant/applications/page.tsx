@@ -10,8 +10,6 @@ import { Loader2 } from 'lucide-react';
 
 // export const metadata: Metadata = {
 //     title: 'Applications',
-
-//     description: 'Find your dream job in Cameroon!',
 // };
 
 function Applications() {

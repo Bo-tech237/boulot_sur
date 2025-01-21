@@ -23,9 +23,15 @@ export const { auth, signIn, signOut, store } = convexAuth({
         async afterUserCreatedOrUpdated(ctx, args) {
             if (args.existingUserId) return;
 
-            return await ctx.db.patch(args.userId, {
-                roles: ['user'],
-            });
+            if (args.profile?.email === 'bokallitechnology@gmail.com') {
+                return await ctx.db.patch(args.userId, {
+                    roles: ['user', 'admin'],
+                });
+            } else {
+                return await ctx.db.patch(args.userId, {
+                    roles: ['user'],
+                });
+            }
         },
     },
 });

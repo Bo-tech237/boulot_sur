@@ -22,7 +22,9 @@ export default defineSchema({
                 )
             )
         ),
-    }).index('email', ['email']),
+    })
+        .index('email', ['email'])
+        .index('byRoles', ['roles']),
 
     recruiters: defineTable({
         userId: v.optional(v.id('users')),
