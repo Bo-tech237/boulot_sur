@@ -1,41 +1,40 @@
 import * as z from 'zod';
 import { jobTypes } from '@/constants/data';
 
-export const jobSchema = z.object({
+
+
+export const step1Schema = z.object({
     title: z.string().min(1, { message: 'Title required' }).min(3, {
         message: 'Title must be at least 3 characters.',
     }),
-    maxApplicants: z.coerce
-        .number()
-        .min(1, { message: 'Max applicants required' }),
-    maxPositions: z.coerce
-        .number()
-        .min(1, { message: 'Max position required' }),
-    activeApplications: z.coerce.number().optional(),
-    acceptedApplicants: z.coerce.number().optional(),
-    skillsets: z
-        .array(
-            z.object({
-                id: z.string(),
-                text: z.string(),
-            })
-        )
-        .min(1, { message: 'Skills required' }),
+    maxApplicants: z.coerce.number().min(1, "Max applicants required"),
+    maxPositions: z.coerce.number().min(1, "Max positions required"),
+  });
+  
+  export const step2Schema = z.object({
+    type: z
+    .string()
+    .min(1, { message: 'Type required' })
+    .refine((value) => jobTypes.includes(value), 'Invalid job type'),
+    category: z.string().min(1, "Category required"),
+    location: z.string().min(1, "Location required"),
+    salary: z.coerce.number().min(1, "Salary required"),
+  });
+  
+  export const step3Schema = z.object({
     description: z
         .string()
         .min(1, { message: 'Description required' })
         .min(10, {
             message: 'Description must be at least 10 characters.',
         }),
-    location: z.string().min(1, { message: 'Location required' }),
-    type: z
-        .string()
-        .min(1, { message: 'Type required' })
-        .refine((value) => jobTypes.includes(value), 'Invalid job type'),
-    category: z.string().min(1, { message: 'Category required' }),
-    salary: z.coerce.number().min(1, { message: 'Salary required' }),
-    rating: z.coerce.number().optional(),
-});
+    skillsets: z.array(
+      z.object({
+        id: z.string(),
+        text: z.string(),
+      })
+    ).min(1, "Skills required"),
+  });
 
 export const applyJobSchema = z.object({
     sop: z
@@ -50,9 +49,11 @@ export const applyJobSchema = z.object({
         }),
 });
 
+export const jobSchema = step1Schema.merge(step2Schema).merge(step3Schema);
+
 export const jobSchemaApi = jobSchema.extend({
     _id: z.string(),
 });
 
+export type jobsTypes = z.infer<typeof jobSchema>;
 export type jobApiTypes = z.infer<typeof jobSchemaApi>;
-export type jobTypes = z.infer<typeof jobSchema>;

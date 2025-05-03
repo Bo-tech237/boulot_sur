@@ -36,7 +36,8 @@ import * as z from 'zod';
 //     });
 // }
 
-export const recruiterSchema = z.object({
+
+const step1Schema = z.object({
     country: z.string().min(1, { message: 'Country required' }),
     city: z.string().min(1, { message: 'City required' }),
     phone: z.coerce
@@ -45,6 +46,10 @@ export const recruiterSchema = z.object({
         .min(8, {
             message: 'Phone number must be at least 8 digits.',
         }),
+});
+
+// Schema for description
+const step2Schema = z.object({
     description: z
         .string()
         .min(1, { message: 'Description required' })
@@ -55,6 +60,8 @@ export const recruiterSchema = z.object({
             message: 'Description must not be longer than 160 characters.',
         }),
 });
+
+export const recruiterSchema = step1Schema.merge(step2Schema);
 
 export const recruiterSchemaApi = recruiterSchema.extend({
     _id: z.string(),

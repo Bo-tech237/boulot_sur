@@ -11,23 +11,11 @@ import { Input } from '@/components/ui/input';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { FormWrapper } from '@/components/forms/formWrapper';
 import { Button } from '@/components/ui/button';
+import { applicantTypes } from '@/lib/applicantSchema';
 
 function ApplicantEducationForm(
     form: UseFormReturn<
-        {
-            education: {
-                institutionName: string;
-                startYear: string;
-                endYear: string;
-            }[];
-            skills: {
-                text: string;
-                id: string;
-            }[];
-            fileId: FileList;
-        },
-        any,
-        undefined
+        applicantTypes
     >
 ) {
     const {

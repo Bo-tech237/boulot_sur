@@ -1,0 +1,16 @@
+{
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "./docs/convex-rules.md"
+    },
+    {
+      "file": "./docs/code-style.md"
+    }
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Be extremely concise and only include the most important information."
+    }
+  ]
+}

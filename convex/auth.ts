@@ -1,37 +1,35 @@
-import { convexAuth } from '@convex-dev/auth/server';
-import Google from '@auth/core/providers/google';
-import { api } from './_generated/api';
-import { fetchQuery, fetchMutation } from 'convex/nextjs';
+import { convexAuth } from "@convex-dev/auth/server";
+import Google from "@auth/core/providers/google";
 
-export const { auth, signIn, signOut, store } = convexAuth({
-    providers: [
-        Google,
-        {
-            id: 'brevo',
-            type: 'email',
-            from: process.env.GMAIL_USER!,
-            server: {},
-            maxAge: 24 * 60 * 60,
-            name: 'Email',
-            options: {},
-            sendVerificationRequest: async (params) => {
-                const { identifier: email, url } = params;
-            },
-        },
-    ],
-    callbacks: {
-        async afterUserCreatedOrUpdated(ctx, args) {
-            if (args.existingUserId) return;
+export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+  providers: [
+    Google,
+    // {
+    //   id: "brevo",
+    //   type: "email",
+    //   from: process.env.GMAIL_USER!,
+    //   server: {},
+    //   maxAge: 24 * 60 * 60,
+    //   name: "Email",
+    //   options: {},
+    //   sendVerificationRequest: async (params) => {
+    //     const { identifier: email, url } = params;
+    //   },
+    // },
+  ],
+  callbacks: {
+    async afterUserCreatedOrUpdated(ctx, args) {
+      if (args.existingUserId) return;
 
-            if (args.profile?.email === 'bokallitechnology@gmail.com') {
-                return await ctx.db.patch(args.userId, {
-                    roles: ['user', 'admin'],
-                });
-            } else {
-                return await ctx.db.patch(args.userId, {
-                    roles: ['user'],
-                });
-            }
-        },
+      if (args.profile?.email === "kouertechnology@gmail.com") {
+        return await ctx.db.patch(args.userId, {
+          roles: ["user", "admin"],
+        });
+      } else {
+        return await ctx.db.patch(args.userId, {
+          roles: ["user"],
+        });
+      }
     },
+  },
 });

@@ -2,44 +2,31 @@ import { ReactElement, useState } from 'react';
 import { UseFormTrigger } from 'react-hook-form';
 import { recruiterTypes } from '../lib/recruiterSchema';
 
+const stepFields: Record<number, (keyof recruiterTypes)[]> = {
+    0: ['country','city','phone'],
+    1: ['description'],
+    
+  };
+
 export function useRecruiterMultistepForm(steps: ReactElement[]) {
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-    const nextLevel = [
-        {
-            fields: ['country', 'city', 'phone'],
-        },
-        {
-            fields: ['description'],
-        },
-    ];
-    type FieldName = keyof recruiterTypes;
+    
     async function next(
-        trigger: UseFormTrigger<{
-            country: string;
-            city: string;
-            phone: number;
-            description: string;
-        }>
+        trigger: UseFormTrigger<recruiterTypes>
     ) {
-        const fields = nextLevel[currentStepIndex].fields;
-        const output = await trigger(fields as FieldName[], {
+        const fields = stepFields[currentStepIndex];
+        const isValid = await trigger(fields, {
             shouldFocus: true,
         });
 
-        if (!output) return;
+        if (!isValid) return;
 
-        setCurrentStepIndex((i) => {
-            if (i >= steps.length - 1) return i;
-            return i + 1;
-        });
+        setCurrentStepIndex((i) => (i >= steps.length - 1 ? i : i + 1));
     }
 
     function back() {
-        setCurrentStepIndex((i) => {
-            if (i <= 0) return i;
-            return i - 1;
-        });
+        setCurrentStepIndex((i) => (i <= 0 ? i : i - 1));
     }
 
     function goTo(index: number) {

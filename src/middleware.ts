@@ -1,8 +1,6 @@
 import {
-    convexAuthNextjsToken,
     convexAuthNextjsMiddleware,
-    createRouteMatcher,
-    isAuthenticatedNextjs,
+    createRouteMatcher,    
     nextjsMiddlewareRedirect,
 } from '@convex-dev/auth/nextjs/server';
 import { fetchQuery } from 'convex/nextjs';
@@ -13,16 +11,18 @@ const isRegisterPage = createRouteMatcher(['/register']);
 const isDashboardPage = createRouteMatcher(['/dashboard']);
 const isProtectedRoute = createRouteMatcher(['/register', '/dashboard(.*)']);
 
-export default convexAuthNextjsMiddleware(async (request) => {
-    const isAuthenticated = await isAuthenticatedNextjs();
+export default convexAuthNextjsMiddleware(async (request,{convexAuth}) => {
+    //const isAuthenticated = await convexAuth.isAuthenticated();
     const user = await fetchQuery(
         api.users.getUser,
         {},
-        { token: await convexAuthNextjsToken() }
+        { token: await convexAuth.getToken() }
     );
 
+    console.log('testAuth:',await convexAuth.isAuthenticated())
+
     // 1. User not authenticated
-    if (!isAuthenticated || !user) {
+    if (!await convexAuth.isAuthenticated() || !user) {
         if (isProtectedRoute(request)) {
             return nextjsMiddlewareRedirect(request, '/login');
         }
@@ -33,7 +33,7 @@ export default convexAuthNextjsMiddleware(async (request) => {
     const hasUserRole = userRoles.length === 1;
     const hasAdditionalRoles = userRoles.length > 1;
 
-    if (isLoginPage(request) && isAuthenticated) {
+    if (isLoginPage(request) && await convexAuth.isAuthenticated()) {
         return nextjsMiddlewareRedirect(request, '/register');
     }
 
@@ -44,7 +44,7 @@ export default convexAuthNextjsMiddleware(async (request) => {
     if (isDashboardPage(request) && hasUserRole) {
         return nextjsMiddlewareRedirect(request, '/register');
     }
-});
+},{cookieConfig:{maxAge: 60 * 60 * 24 * 30}});
 
 export const config = {
     matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],

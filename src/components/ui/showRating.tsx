@@ -1,80 +1,72 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Star } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { Star } from "lucide-react";
 
 type Props = {
-    userRating?: number;
+  userRating?: number;
 };
 
 export function ShowRating({ userRating }: Props) {
-    const [hasMounted, setHasMounted] = useState(false);
-    let activeStars: number | undefined = userRating || 0;
-    const totalStars = 5;
+  const [hasMounted, setHasMounted] = useState(false);
+  let activeStars: number | undefined = userRating || 0;
+  const totalStars = 5;
 
-    useEffect(() => {
-        setHasMounted(true);
-    }, []);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
-    if (!hasMounted || activeStars === undefined) {
-        return null;
-    }
+  if (!hasMounted || activeStars === undefined) {
+    return null;
+  }
 
-    return (
-        <div className="flex justify-between items-center gap-2">
-            <div
+  return (
+    <div className="flex justify-between items-center gap-2">
+      <div
+        style={{
+          display: "inline-flex",
+          position: "relative",
+          textAlign: "left",
+        }}
+      >
+        {[...new Array(totalStars)].map((_, index) => {
+          const activeState = activeStars;
+          const showEmptyIcon = activeState === -1 || activeState < index + 1;
+          const isActiveRating = activeState !== 1;
+          const isRatingWithPrecision = activeState % 1 !== 0;
+          const isRatingEqualToIndex = Math.ceil(activeState) === index + 1;
+          const showRatingWithPrecision =
+            isActiveRating && isRatingWithPrecision && isRatingEqualToIndex;
+          return (
+            <div className="relative" key={index}>
+              <div
                 style={{
-                    display: 'inline-flex',
-                    position: 'relative',
-                    textAlign: 'left',
+                  width: showRatingWithPrecision
+                    ? `${(activeState % 1) * 100}%`
+                    : "0%",
+                  overflow: "hidden",
+                  position: "absolute",
                 }}
-            >
-                {[...new Array(totalStars)].map((_, index) => {
-                    const activeState = activeStars;
-                    const showEmptyIcon =
-                        activeState === -1 || activeState < index + 1;
-                    const isActiveRating = activeState !== 1;
-                    const isRatingWithPrecision = activeState % 1 !== 0;
-                    const isRatingEqualToIndex =
-                        Math.ceil(activeState) === index + 1;
-                    const showRatingWithPrecision =
-                        isActiveRating &&
-                        isRatingWithPrecision &&
-                        isRatingEqualToIndex;
-                    return (
-                        <div className="relative" key={index}>
-                            <div
-                                style={{
-                                    width: showRatingWithPrecision
-                                        ? `${(activeState % 1) * 100}%`
-                                        : '0%',
-                                    overflow: 'hidden',
-                                    position: 'absolute',
-                                }}
-                            >
-                                <Star size={30} fill="orange" color="orange" />
-                            </div>
-                            {/*Note here */}
-                            <div
-                                style={{
-                                    color: showEmptyIcon ? 'gray' : 'inherit',
-                                }}
-                            >
-                                {showEmptyIcon ? (
-                                    <Star size={30} />
-                                ) : (
-                                    <Star
-                                        size={30}
-                                        fill="orange"
-                                        color="orange"
-                                    />
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
+              >
+                <Star size={30} fill="orange" color="orange" />
+              </div>
+              {/*Note here */}
+              <div
+                style={{
+                  color: showEmptyIcon ? "gray" : "inherit",
+                }}
+              >
+                {showEmptyIcon ? (
+                  <Star size={30} />
+                ) : (
+                  <Star size={30} fill="orange" color="orange" />
+                )}
+              </div>
             </div>
-            {/* <span className="text-2xl">{activeStars}</span> */}
-        </div>
-    );
+          );
+        })}
+      </div>
+      {/* <span className="text-2xl">{activeStars}</span> */}
+    </div>
+  );
 }
