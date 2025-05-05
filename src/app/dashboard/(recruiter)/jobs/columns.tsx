@@ -14,14 +14,13 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import DeleteDialog from "@/components/DeleteApplicationsDialog";
-import { ShowRating } from "@/components/ui/showRating";
 import { formatMoney } from "@/lib/friendly-time";
 import { truncateAtLastSpace } from "@/lib/truncateText";
 import { Doc } from "../../../../../convex/_generated/dataModel";
 import DeleteJobsDialog from "@/components/DeleteJobsDialog";
 import { StarRating } from "@/components/StarRating";
 import { useState } from "react";
+import { DataTableRowActions } from "./data-table-row-actions";
 
 export const columns: ColumnDef<Doc<"jobs">>[] = [
   {
@@ -146,45 +145,6 @@ export const columns: ColumnDef<Doc<"jobs">>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const [isOpen, setIsOpen] = useState(false);
-
-      const job = row.original;
-
-      return (
-        <>
-          <DeleteJobsDialog
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-            id={job?._id}
-          />
-
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onSelect={() => setIsOpen(true)}
-              >
-                Delete Job
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href={`/dashboard/create-job/${job?._id}`}>
-                  Update Job
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
-      );
-    },
+    cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ];
