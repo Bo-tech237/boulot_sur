@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://boulot-sur-r1v9.vercel.app/sitemap.xml
